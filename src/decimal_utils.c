@@ -51,7 +51,7 @@ int get_scale(int service_bits){
 
 void set_sign(s21_decimal *value, int sign) {
    int value = 0;
-   if (sign == SIGN_NEGATIVE) value = 8;
+   if (sign == SIGN_NEGATIVE) value = 128;
    value->bits[SIGNIFICANT_BYTES] = set_byte(value->bits[SIGNIFICANT_BYTES], 3, value);
 }
 
