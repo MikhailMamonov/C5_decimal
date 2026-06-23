@@ -1,4 +1,7 @@
 #define COUNT_OF_BITS 4
+#define SIGNIFICANT_BYTES 3
+#define SIGN_NEGATIVE 1
+#define SIGN_POSITIVE 0
 #define SUCCESS 0
 #define FAIL_TOO_LARGE 1
 #define FAIL_TOO_SMALL 2
