@@ -1,4 +1,7 @@
 #define COUNT_OF_BITS 4
+#define SIGNIFICANT_BYTES 3
+#define SIGN_NEGATIVE 1
+#define SIGN_POSITIVE 0
 #define SUCCESS 0
 #define FAIL_TOO_LARGE 1
 #define FAIL_TOO_SMALL 2
@@ -7,7 +10,12 @@
 #define SIGN_MASK 0x80000000
 #define SIGN_BIT 31
 #define MAX_MASK 0xFFFFFFFF
+#define MAX_UNSIGNED_LONG 0xFFFFFFFFULL
 #define SCALE_BIT 16 
+#define NEGATIVE_BYTE_VALUE 128
+#define SCALE_BYTE_IDX 2
+#define SIGN_BYTE_IDX 3
+#define BITS_IN_BYTE 8
 
 
 typedef struct 
