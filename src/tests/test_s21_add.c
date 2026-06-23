@@ -33,7 +33,7 @@ static void run_add_test(addParams *params) {
 }
 
 // Основные случаи: разный регистр, цифры, символы
-SUB_TEST_CASES(add_positive, {
+ADD_TEST_CASES(add_positive, {
   .value1 = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
   .value2 = {{0x00000002, 0x00000000, 0x00000000, 0x00000000}}, // 2
   .expected_result = {{0x00000003, 0x00000000, 0x00000000, 0x00000000}}, // 3
@@ -41,7 +41,7 @@ SUB_TEST_CASES(add_positive, {
   .test_name = "1 + 2 = 3"
 })
 
-SUB_TEST_CASES(add_negative, {
+ADD_TEST_CASES(add_negative, {
   .value1 = {{0x00000005, 0x00000000, 0x00000000, 0x80000000}}, // -5
   .value2 = {{0x00000003, 0x00000000, 0x00000000, 0x80000000}}, // -3
   .expected_result = {{0x00000008, 0x00000000, 0x00000000, 0x80000000}}, // -8
@@ -49,7 +49,7 @@ SUB_TEST_CASES(add_negative, {
   .test_name = "-5 + (-3) = -8"
 })
 
-SUB_TEST_CASES(add_mixed_positive, {
+ADD_TEST_CASES(add_mixed_positive, {
   .value1 = {{0x0000000A, 0x00000000, 0x00000000, 0x00000000}}, // 10
   .value2 = {{0x00000004, 0x00000000, 0x00000000, 0x80000000}}, // -4
   .expected_result = {{0x00000006, 0x00000000, 0x00000000, 0x00000000}}, // 6
@@ -58,7 +58,7 @@ SUB_TEST_CASES(add_mixed_positive, {
 })
 
 
-SUB_TEST_CASES(add_mixed_negative, {
+ADD_TEST_CASES(add_mixed_negative, {
   .value1 = {{0x00000005, 0x00000000, 0x00000000, 0x00000000}}, // 5
   .value2 = {{0x0000000C, 0x00000000, 0x00000000, 0x80000000}}, // -12
   .expected_result = {{0x00000007, 0x00000000, 0x00000000, 0x80000000}}, // -7
