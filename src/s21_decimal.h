@@ -15,6 +15,7 @@
 #define NEGATIVE_BYTE_VALUE 128
 #define SCALE_BYTE_IDX 2
 #define SIGN_BYTE_IDX 3
+#define BITS_IN_BYTE 8
 
 
 typedef struct 

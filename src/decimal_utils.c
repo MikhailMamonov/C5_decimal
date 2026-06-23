@@ -9,18 +9,19 @@ int get_scale(int service_bits){
 
  int compare_mantissas(s21_decimal value_1, s21_decimal value_2) {
     int res = 0;
-    for (int i = SIGNIFICANT_BYTES; i >= 0; i--) {
+    for (int i = SIGNIFICANT_BYTES - 1; i >= 0; i--) {
       unsigned int a = (unsigned int) value_1.bits[i];
       unsigned int b = (unsigned int) value_2.bits[i];
-      if (a != b) res = (int)a - b;
+      if (a > b) {
+            res = SIGN_POSITIVE; 
+            break;
+        }
+        if (a < b) {
+            res = SIGN_NEGATIVE; 
+            break;
+        }
     }
-    if (res < 0) {
-      return SIGN_NEGATIVE;
-    } else if (res > 0) {
-      return SIGN_POSITIVE;
-    } else {
-      return res;
-    }
+    return (int)res;
  }
 
  int substract_mantissas(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
@@ -62,8 +63,10 @@ int get_scale(int service_bits){
  }
 
 void set_sign(s21_decimal *value, int sign) {
-   int byte_value = 0;
-   if (sign == SIGN_NEGATIVE) byte_value = NEGATIVE_BYTE_VALUE;
+   int byte_value = SIGN_POSITIVE;
+   if (sign == SIGN_NEGATIVE) { 
+      byte_value = NEGATIVE_BYTE_VALUE;
+   }
    value->bits[SIGNIFICANT_BYTES] = set_byte(value->bits[SIGNIFICANT_BYTES], SIGN_BYTE_IDX, byte_value);
 }
 
@@ -72,7 +75,7 @@ void set_scale(s21_decimal *value, int scale) {
 }
 
 int set_byte(int num, int byte_index, unsigned char new_byte) {
-    int shift = byte_index * 8;
+    int shift = byte_index * BITS_IN_BYTE;
 
     int clear_mask = ~(0xFF << shift);
 
