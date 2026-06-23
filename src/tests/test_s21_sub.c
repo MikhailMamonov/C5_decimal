@@ -15,7 +15,7 @@ static int compare_decimal(const s21_decimal *a, const s21_decimal *b){
     return 1;
 }
 
-static void run_add_test(addParams *params) {
+static void run_sub_test(addParams *params) {
   s21_decimal result = {{0}};/*  */
 
   int return_code = s21_add(params->value1, params->value2, &result);
@@ -33,7 +33,7 @@ static void run_add_test(addParams *params) {
 }
 
 // Основные случаи: разный регистр, цифры, символы
-SUB_TEST_CASES(add_positive, {
+SUB_TEST_CASES(sub_positive, {
   .value1 = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
   .value2 = {{0x00000002, 0x00000000, 0x00000000, 0x00000000}}, // 2
   .expected_result = {{0x00000003, 0x00000000, 0x00000000, 0x00000000}}, // 3
@@ -41,7 +41,7 @@ SUB_TEST_CASES(add_positive, {
   .test_name = "1 + 2 = 3"
 })
 
-SUB_TEST_CASES(add_negative, {
+SUB_TEST_CASES(sub_negative, {
   .value1 = {{0x00000005, 0x00000000, 0x00000000, 0x80000000}}, // -5
   .value2 = {{0x00000003, 0x00000000, 0x00000000, 0x80000000}}, // -3
   .expected_result = {{0x00000008, 0x00000000, 0x00000000, 0x80000000}}, // -8
@@ -49,7 +49,7 @@ SUB_TEST_CASES(add_negative, {
   .test_name = "-5 + (-3) = -8"
 })
 
-SUB_TEST_CASES(add_mixed_positive, {
+SUB_TEST_CASES(sub_mixed_positive, {
   .value1 = {{0x0000000A, 0x00000000, 0x00000000, 0x00000000}}, // 10
   .value2 = {{0x00000004, 0x00000000, 0x00000000, 0x80000000}}, // -4
   .expected_result = {{0x00000006, 0x00000000, 0x00000000, 0x00000000}}, // 6
@@ -58,7 +58,7 @@ SUB_TEST_CASES(add_mixed_positive, {
 })
 
 
-SUB_TEST_CASES(add_mixed_negative, {
+SUB_TEST_CASES(sub_mixed_negative, {
   .value1 = {{0x00000005, 0x00000000, 0x00000000, 0x00000000}}, // 5
   .value2 = {{0x0000000C, 0x00000000, 0x00000000, 0x80000000}}, // -12
   .expected_result = {{0x00000007, 0x00000000, 0x00000000, 0x80000000}}, // -7
@@ -72,10 +72,10 @@ Suite *to_lower_suite_create(void) {
   Suite *s = suite_create("to_lower");
   TCase *tc = tcase_create("core");
 
-  tcase_add_test(tc, test_add_positive);
-  tcase_add_test(tc, test_add_negative);
-  tcase_add_test(tc, test_add_mixed_negative);
-  tcase_add_test(tc, test_add_mixed_positive);
+  tcase_add_test(tc, test_sub_positive);
+  tcase_add_test(tc, test_sub_negative);
+  tcase_add_test(tc, test_sub_mixed_negative);
+  tcase_add_test(tc, test_sub_mixed_positive);
   suite_add_tcase(s, tc);
   return s;
 }
