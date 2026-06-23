@@ -12,6 +12,9 @@
 #define MAX_MASK 0xFFFFFFFF
 #define MAX_UNSIGNED_LONG 0xFFFFFFFFULL
 #define SCALE_BIT 16 
+#define NEGATIVE_BYTE_VALUE 128
+#define SCALE_BYTE_IDX 2
+#define SIGN_BYTE_IDX 3
 
 
 typedef struct 
