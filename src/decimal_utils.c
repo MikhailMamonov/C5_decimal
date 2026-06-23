@@ -50,5 +50,23 @@ int get_scale(int service_bits){
  }
 
 void set_sign(s21_decimal *value, int sign) {
-   return;
+   int value = 0;
+   if (sign == SIGN_NEGATIVE) value = 8;
+   value->bits[SIGNIFICANT_BYTES] = set_byte(value->bits[SIGNIFICANT_BYTES], 3, value);
+}
+
+void set_scale(s21_decimal *value, int scale) {
+   value->bits[SIGNIFICANT_BYTES] = set_byte(value->bits[SIGNIFICANT_BYTES], 2, scale);
+}
+
+int set_byte(int num, int byte_index, unsigned char new_byte) {
+    int shift = byte_index * 8;
+
+    int clear_mask = ~(0xFF << shift);
+
+    num = num & clear_mask;
+
+    num = num | (new_byte << shift);
+
+    return num;
 }
