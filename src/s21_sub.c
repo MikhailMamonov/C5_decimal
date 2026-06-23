@@ -6,7 +6,7 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
         set_scale(result, get_scale(value_1.bits[SIGNIFICANT_BYTES]));
     }
 
-    int result = SUCCESS
+    int result = SUCCESS;
 
     if(get_sign(value_1.bits[SIGNIFICANT_BYTES]) != get_sign(value_2.bits[SIGNIFICANT_BYTES]) && !will_addition_overflow(value_1, value_2)) {
         s21_add_mantissas(value_1, value_2, result);

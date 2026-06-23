@@ -19,7 +19,7 @@ int get_scale(int service_bits){
         unsigned int value_2_unsigned = (unsigned int)value_2.bits[i];
         unsigned long long diff = (unsigned long long)value_1_unsigned - value_2_unsigned - borrow;
 
-        if (diff > 0xFFFFFFFFULL) {
+        if (diff > MAX_UNSIGNED_LONG) {
             borrow = 1;
             result->bits[i] = (int)(unsigned int)(diff & MAX_MASK);
         } else {
