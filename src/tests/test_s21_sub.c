@@ -15,10 +15,12 @@ static int compare_decimal(const s21_decimal *a, const s21_decimal *b){
     return 1;
 }
 
-static void run_sub_test(addParams *params) {
-  s21_decimal result = {{0}};/*  */
+static void run_sub_test(subParams *params) {
+  s21_decimal result;
 
-  int return_code = s21_add(params->value1, params->value2, &result);
+  result.bits[0] = result.bits[1] = result.bits[2] = result.bits[3] = 0;
+
+  int return_code = s21_sub(params->value1, params->value2, &result);
 
   ck_assert_int_eq(return_code, params->expected_return_code);
 
@@ -26,56 +28,100 @@ static void run_sub_test(addParams *params) {
     ck_assert_msg(compare_decimal(&result, &params->expected_result),
         "test '%s' failed: result not match with expected.",
         params->test_name);
-    ck_assert_ptr_ne((void *)&result, (void *)&params->value1);
-    ck_assert_ptr_ne((void *)&result, (void *)&params->value2);
   }
   printf("[PASS] %s\n", params->test_name);
 }
 
-// Основные случаи: разный регистр, цифры, символы
-SUB_TEST_CASES(sub_positive, {
-  .value1 = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
-  .value2 = {{0x00000002, 0x00000000, 0x00000000, 0x00000000}}, // 2
-  .expected_result = {{0x00000003, 0x00000000, 0x00000000, 0x00000000}}, // 3
+SUB_TEST_CASES(sub_two_positives_basic, {
+  .value1 = {{0x00000019, 0x00000000, 0x00000000, 0x00000000}}, // 25
+  .value2 = {{0x00000007, 0x00000000, 0x00000000, 0x00000000}}, // 7
+  .expected_result = {{0x00000012, 0x00000000, 0x00000000, 0x00000000}}, // 18
   .expected_return_code = 0,
-  .test_name = "1 + 2 = 3"
+  .test_name = "25 - 7 = 18"
 })
 
-SUB_TEST_CASES(sub_negative, {
-  .value1 = {{0x00000005, 0x00000000, 0x00000000, 0x80000000}}, // -5
-  .value2 = {{0x00000003, 0x00000000, 0x00000000, 0x80000000}}, // -3
-  .expected_result = {{0x00000008, 0x00000000, 0x00000000, 0x80000000}}, // -8
-  .expected_return_code = 0,
-  .test_name = "-5 + (-3) = -8"
-})
-
-SUB_TEST_CASES(sub_mixed_positive, {
+SUB_TEST_CASES(sub_result_goes_negative, {
   .value1 = {{0x0000000A, 0x00000000, 0x00000000, 0x00000000}}, // 10
-  .value2 = {{0x00000004, 0x00000000, 0x00000000, 0x80000000}}, // -4
-  .expected_result = {{0x00000006, 0x00000000, 0x00000000, 0x00000000}}, // 6
+  .value2 = {{0x0000001E, 0x00000000, 0x00000000, 0x00000000}}, // 30
+  .expected_result = {{0x00000014, 0x00000000, 0x00000000, 0x80000000}}, // -20
+  .expected_return_code = 0,
+  .test_name = "10 - 30 = -20"
+})
+
+SUB_TEST_CASES(sub_two_negatives, {
+  .value1 = {{0x0000000F, 0x00000000, 0x00000000, 0x80000000}}, // -15
+  .value2 = {{0x00000005, 0x00000000, 0x00000000, 0x80000000}}, // -5
+  .expected_result = {{0x0000000A, 0x00000000, 0x00000000, 0x80000000}}, // -10
+  .expected_return_code = 0,
+  .test_name = "(-15) - (-5) = -10"
+})
+
+SUB_TEST_CASES(sub_different_scales_simple, {
+  .value1 = {{0x0000002A, 0x00000000, 0x00000000, 0x00010000}}, // 4.2 (scale 1, мантисса 42)
+  .value2 = {{0x00000002, 0x00000000, 0x00000000, 0x00000000}}, // 2.0 (scale 0, мантисса 2)
+  .expected_result = {{0x00000016, 0x00000000, 0x00000000, 0x00010000}}, // 2.2 (scale 1, мантисса 22)
+  .expected_return_code = 0,
+  .test_name = "4.2 - 2 = 2.2"
+})
+
+SUB_TEST_CASES(sub_zero_result_preserves_scale, {
+  .value1 = {{0x00000005, 0x00000000, 0x00000000, 0x00020000}}, // 0.05 (scale 2)
+  .value2 = {{0x00000005, 0x00000000, 0x00000000, 0x00020000}}, // 0.05 (scale 2)
+  .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00020000}}, // 0.00 (scale 2)
+  .expected_return_code = 0,
+  .test_name = "0.05 - 0.05 = 0.00"
+})
+
+SUB_TEST_CASES(sub_bankers_rounding_down, {
+  .value1 = {{0x0000000F, 0x00000000, 0x00000000, 0x00000000}}, // 15
+  .value2 = {{0x0000000E, 0x00000000, 0x00000000, 0x001C0000}}, // 0.0000000000000000000000000014 (scale 28)
+  .expected_result = {{0x0000000F, 0x00000000, 0x00000000, 0x00000000}}, // 15 (усекается без округления вверх)
+  .expected_return_code = 0,
+  .test_name = "15 - 1.4e-26 = 15"
+})
+
+SUB_TEST_CASES(sub_bankers_rounding_to_even, {
+  .value1 = {{0x00000019, 0x00000000, 0x00000000, 0x00000000}}, // 25 (нечетное)
+  .value2 = {{0x00000032, 0x00000000, 0x00000000, 0x001C0000}}, // 0.0000000000000000000000000050 (scale 28, чистая половина)
+  .expected_result = {{0x0000001A, 0x00000000, 0x00000000, 0x00000000}}, // 26 (округлилось вверх к ближайшему четному)
   .expected_return_code = 0,
   .test_name = "10 + (-4) = 6"
+})
+
+
+SUB_TEST_CASES(sub_overflow_to_negative_infinity, {
+  .value1 = {{0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x80000000}}, // -MAX_DECIMAL
+  .value2 = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
+  .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, 
+  .expected_return_code = 2, // FAIL_TOO_SMALL
+  .test_name = "(-MAX_DECIMAL) - 1 = Underflow"
 })
 
 
 SUB_TEST_CASES(sub_mixed_negative, {
   .value1 = {{0x00000005, 0x00000000, 0x00000000, 0x00000000}}, // 5
   .value2 = {{0x0000000C, 0x00000000, 0x00000000, 0x80000000}}, // -12
-  .expected_result = {{0x00000007, 0x00000000, 0x00000000, 0x80000000}}, // -7
+  .expected_result = {{0x00000011, 0x00000000, 0x00000000, 0x00000000}}, // 17
   .expected_return_code = 0,
-  .test_name = "5 + (-12) = -7"
+  .test_name = "5 - (-12) = 17"
 })
 
 
 
-Suite *to_lower_suite_create(void) {
-  Suite *s = suite_create("to_lower");
+Suite *sub_suite_create(void) {
+  Suite *s = suite_create("Substract");
   TCase *tc = tcase_create("core");
 
-  tcase_add_test(tc, test_sub_positive);
-  tcase_add_test(tc, test_sub_negative);
-  tcase_add_test(tc, test_sub_mixed_negative);
-  tcase_add_test(tc, test_sub_mixed_positive);
+  tcase_add_test(tc, sub_two_positives_basic);
+  tcase_add_test(tc, sub_result_goes_negative);
+  tcase_add_test(tc, sub_two_negatives);
+  tcase_add_test(tc, sub_different_scales_simple);
+  tcase_add_test(tc, sub_zero_result_preserves_scale);
+  tcase_add_test(tc, sub_bankers_rounding_down);
+  tcase_add_test(tc, sub_bankers_rounding_to_even);
+  tcase_add_test(tc, sub_overflow_to_infinity);
+  tcase_add_test(tc, sub_overflow_to_negative_infinity);
+  tcase_add_test(tc, sub_mixed_negative);
   suite_add_tcase(s, tc);
   return s;
 }

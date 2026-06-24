@@ -18,7 +18,7 @@ void assemble_srunner(SRunner *sr) {
 
 int main(void) {
   int failed = 0;
-  SRunner *sr = srunner_create(memchr_suite_create());
+  SRunner *sr = srunner_create();
   assemble_srunner(sr);
 
   srunner_run_all(sr, CK_NORMAL);
