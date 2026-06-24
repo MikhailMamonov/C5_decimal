@@ -16,7 +16,8 @@
 #define SCALE_BYTE_IDX 2
 #define SIGN_BYTE_IDX 3
 #define BITS_IN_BYTE 8
-#define ELDER_BIT 31
+#define ELDER_BIT 95
+#define BITS_IN_INT 32
 
 
 typedef struct 
