@@ -12,6 +12,7 @@
 #define SCALE_BIT 16 
 #define SCALE_BYTE_IDX 2
 #define BITS_IN_BYTE 8
+#define BITS_IN_INT 32
 
 
 
