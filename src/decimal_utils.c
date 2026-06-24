@@ -85,3 +85,9 @@ int set_byte(int num, int byte_index, unsigned char new_byte) {
 
     return num;
 }
+
+s21_decimal div_by_10(s21_decimal num) {
+    for (int i = SIGNIFICANT_BYTES - 1; i >= 0; i--) {
+        for (int j = ELDER_BIT; j )
+    }
+}
