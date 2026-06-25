@@ -88,19 +88,22 @@ int set_byte(int num, int byte_index, unsigned char new_byte) {
     return num;
 }
 
-s21_decimal div_by_10(s21_decimal num, int *remainder) {
-    //int remainder = 0;
-    s21_decimal answer = {0};
+int div_by_10(s21_decimal *num) {
+    int remainder = 0;
+    s21_decimal copy = *num;
+    for (int i = 0; i < SIGNIFICANT_BYTES; i++) {
+        num->bits[i] = 0;
+    }
     for (int i = ELDER_BIT; i >= 0; i--) {
             int curr_byte = i / BITS_IN_INT;
             int bit_num = i % BITS_IN_INT;
             unsigned int bit_mask = 1 << bit_num;
-            unsigned int bit = ((unsigned int)num.bits[curr_byte] & bit_mask) >> bit_num;
-            *remainder = *remainder << 1;
-            *remainder += bit;
-            if (*remainder >= 10) {
-                *remainder -= 10;
-                answer.bits[curr_byte] = answer.bits[curr_byte] | bit_mask;
+            unsigned int bit = ((unsigned int)copy.bits[curr_byte] & bit_mask) >> bit_num;
+            remainder = remainder << 1;
+            remainder += bit;
+            if (remainder >= 10) {
+                remainder -= 10;
+                num->bits[curr_byte] = num->bits[curr_byte] | bit_mask;
             }
     }
     /*if (remainder > 5) {
@@ -112,8 +115,7 @@ s21_decimal div_by_10(s21_decimal num, int *remainder) {
             answer = add_one(answer);
         }
     }*/
-    answer.bits[SIGNIFICANT_BYTES] = num.bits[SIGNIFICANT_BYTES];
-    return answer;
+    return remainder;
 }
 
 s21_decimal add_one(s21_decimal num) {
