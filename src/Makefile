@@ -41,7 +41,7 @@ $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(OBJ_DIR)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-# Компиляция объектных файлов тестов из папки tests/ (добавляем -I. для поиска s21_decimal.h в корне)
+# Компиляция объектных файлов тестов из папки tests/ (добавляем -I. для поиска s21_decimal.h in root)
 $(OBJ_DIR)/%.o: $(TEST_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	@$(CC) $(CFLAGS) -I. -c $< -o $@
@@ -51,6 +51,17 @@ test: $(LIB_NAME) $(OBJ_TEST)
 	@$(CC) $(CFLAGS) $(OBJ_TEST) $(LIB_NAME) $(LIBS) -o $(TEST_EXEC)
 	@echo "--- Запуск тестов ---"
 	@./$(TEST_EXEC)
+
+# Проверка на утечки памяти с помощью Valgrind (Memcheck)
+valgrind: clean $(OBJ)
+	@ar rcs $(LIB_NAME) $(OBJ)
+	@mkdir -p $(OBJ_DIR)
+	@echo "--- Сборка тестов с отладочной информацией ---"
+	@$(CC) $(CFLAGS) -g -I. -c $(SRC_TEST)
+	@mv *.o $(OBJ_DIR)/
+	@$(CC) $(CFLAGS) -g $(OBJ_DIR)/*.o $(LIB_NAME) $(LIBS) -o $(TEST_EXEC)
+	@echo "--- Анализ памяти с помощью Valgrind Memcheck ---"
+	@valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TEST_EXEC)
 
 # Генерация HTML отчета о покрытии кода тестами
 gcov_report: clean_gcov
@@ -98,6 +109,4 @@ clean_gcov:
 rebuild: clean all
 
 # Указание, что эти цели не являются реальными файлами
-.PHONY: all test gcov_report style_check style_fix clean clean_gcov rebuild
-
-
+.PHONY: all test valgrind gcov_report style_check style_fix clean clean_gcov rebuild
