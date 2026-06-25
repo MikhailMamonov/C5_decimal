@@ -90,10 +90,7 @@ int set_byte(int num, int byte_index, unsigned char new_byte) {
 
 s21_decimal div_by_10(s21_decimal num, int *remainder) {
     //int remainder = 0;
-    s21_decimal answer;
-    for (int i = 0 ; i < SIGNIFICANT_BYTES; i++) {
-        answer.bits[i] = 0;
-    }
+    s21_decimal answer = {0};
     for (int i = ELDER_BIT; i >= 0; i--) {
             int curr_byte = i / BITS_IN_INT;
             int bit_num = i % BITS_IN_INT;
