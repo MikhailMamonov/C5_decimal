@@ -66,22 +66,21 @@ int set_byte(int num, int byte_index, unsigned char new_byte) {
 }
 
 int shift_left_1_bit(s21_decimal * value){
-    int overflow_0_to_1 = (value->bits[0]>>LAST_BIT)&SINGLE_BIT; 
-    int overflow_1_to_2 = (value->bits[1]>>LAST_BIT)&SINGLE_BIT;
-    int overflow_all = 0;
-    if((value->bits[2]>> LAST_BIT)&1){
-        overflow_all = 1;
-    }
-    value->bits[0] <<=SINGLE_BIT;
-    value->bits[1] <<=SINGLE_BIT;
-    value->bits[2] <<=SINGLE_BIT;
+    unsigned int *b = (unsigned int *)value->bits;
+    
+    int overflow_0_to_1 = (b[0]>>LAST_BIT)&SINGLE_BIT; 
+    int overflow_1_to_2 = (b[1]>>LAST_BIT)&SINGLE_BIT;
+    int overflow_all = (b[2]>> LAST_BIT)&SINGLE_BIT;
+    b[0] <<=SINGLE_BIT;
+    b[1] <<=SINGLE_BIT;
+    b[2] <<=SINGLE_BIT;
 
     if(overflow_0_to_1){
-        value->bits[1] |= overflow_0_to_1;
+        b[1] |= 1u;
     }
 
     if(overflow_1_to_2){
-        value->bits[2] |= overflow_1_to_2;
+        b[2]|= 1u;
     }
 
     return overflow_all;
