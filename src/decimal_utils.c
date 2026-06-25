@@ -1,4 +1,5 @@
 #include "decimal_utils.h"
+#include <cstddef>
 
 int get_sign(int service_bits){
     return (service_bits & SIGN_MASK) >> SIGN_BIT;
@@ -105,37 +106,79 @@ void align_scales(s21_decimal * value_1, s21_decimal * value_2){
     int scale_1 = get_scale(value_1->bits[3]);
     int scale_2 = get_scale(value_2->bits[3]);
 
-    while (scale_1!=scale_2){
-        s21_decimal *target = (void *)0;
-        s21_decimal *source = (void *)0;
-        int * target_scale = (void *)0;
-        int * source_scale = (void *)0;
+    int isOverflow = 0;
+    int existNonNull = 0;
 
-        if(scale_1>scale_2){
-            target_scale = &scale_1;
-            source_scale = &scale_2;
-            target = value_1;
-            source = value_2;
-        }
-        else{
-            target_scale = &scale_2;
-            source_scale = &scale_1;
-            target = value_2;
-            source = value_1;
-        }
+    s21_decimal backup_1 = *value_1;
+    s21_decimal backup_2 = *value_2;
 
-        s21_decimal backup = *target;
+    while (scale_1 != scale_2 && !isOverflow){
+        s21_decimal *target = (scale_1 < scale_2) ? value_1 : value_2;
+        int *target_scale   = (scale_1 < scale_2) ? &scale_1 : &scale_2;
+
         if(mul_by_10(target)){
-            *target = backup;
-            div_by_10(source);
-            (*source_scale)--;
-            set_scale(source, *source_scale);
+            isOverflow = 1;
         }
         else{
             (*target_scale)++;
             set_scale(target, *target_scale);
         }
-    } 
+    }
+
+    if(isOverflow){
+        *value_1 = backup_1;
+        *value_2 = backup_2;
+        scale_1 = get_scale(value_1->bits[3]);
+        scale_2 = get_scale(value_2->bits[3]);
+
+        int round_up = 0;
+        s21_decimal *source = NULL;
+
+        int remainder = 0;
+        while (scale_1 != scale_2){
+            if (remainder != 0) {
+                existNonNull = 1;
+            }
+            source = (scale_1 > scale_2) ? value_1 : value_2;
+            int * source_scale = (scale_1 > scale_2) ? &scale_1 : &scale_2;
+            
+            remainder = div_by_10(source);
+            
+            (*source_scale)--;
+            set_scale(source, *source_scale);
+        }
+
+        if(remainder>=ROUND_THRESHOLD){
+             if(remainder > ROUND_THRESHOLD){
+                round_up = 1;
+            }
+            else if(remainder == ROUND_THRESHOLD){
+                if(existNonNull){
+                    round_up= 1;    
+                }
+                //.5 clear digit -> Banking round
+                else {
+                    if ((unsigned int)source->bits[0] & 1) {
+                        round_up = 1;
+                    }     
+                }
+            }
+            }
+
+            if (round_up){
+                s21_decimal one = {{1, 0, 0, 0}};
+                s21_decimal temp_res ={{0, 0, 0, 0}};
+                s21_add_mantissas(*source, one, &temp_res);
+
+                int current_sign = get_sign(source->bits[3]);
+                int current_scale = get_scale(source->bits[3]);
+
+                *source = temp_res;
+
+                set_sign(source, current_sign);
+                set_scale(source,current_scale);
+            }
+    }
 }
 
 

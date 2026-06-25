@@ -13,6 +13,7 @@
 #define SCALE_BYTE_IDX 2
 #define BITS_IN_BYTE 8
 #define BITS_IN_INT 32
+#define ROUND_THRESHOLD 5
 
 
 
