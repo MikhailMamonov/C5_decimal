@@ -25,6 +25,9 @@ OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
 SRC_TEST = $(wildcard $(TEST_DIR)/*.c)
 OBJ_TEST = $(SRC_TEST:$(TEST_DIR)/%.c=$(OBJ_DIR)/%.o)
 
+# Сбор всех файлов проекта (.c и .h) для проверки стиля
+ALL_FORMAT_FILES = $(wildcard *.c) $(wildcard *.h) $(wildcard $(TEST_DIR)/*.c) $(wildcard $(TEST_DIR)/*.h)
+
 # Главная цель
 all: $(LIB_NAME)
 
@@ -67,6 +70,18 @@ gcov_report: clean_gcov
 	@genhtml -o $(GCOV_DIR) $(OBJ_DIR)/coverage.info
 	@echo "--- Отчет успешно создан в папке $(GCOV_DIR)/index.html ---"
 
+# Проверка стиля кода по стандарту Google
+style_check:
+	@echo "--- Проверка стиля clang-format (Google style) ---"
+	@clang-format -style=Google -n --Werror $(ALL_FORMAT_FILES)
+	@echo "--- Проверка стиля пройдена успешно ---"
+
+# Автоматическое исправление стиля во всех файлах проекта
+style_fix:
+	@echo "--- Исправление стиля clang-format (Google style) ---"
+	@clang-format -style=Google -i $(ALL_FORMAT_FILES)
+	@echo "--- Форматирование файлов завершено ---"
+
 # Полная очистка проекта
 clean: clean_gcov
 	@rm -rf $(OBJ_DIR)
@@ -83,5 +98,6 @@ clean_gcov:
 rebuild: clean all
 
 # Указание, что эти цели не являются реальными файлами
-.PHONY: all test gcov_report clean clean_gcov rebuild
+.PHONY: all test gcov_report style_check style_fix clean clean_gcov rebuild
+
 
