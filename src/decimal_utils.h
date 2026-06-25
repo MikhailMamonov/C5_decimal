@@ -11,6 +11,6 @@ void set_sign(s21_decimal *value, int sign);
 void set_scale(s21_decimal *value, int scale);
 int s21_add_mantissas(s21_decimal value_1, s21_decimal value_2, s21_decimal * result);
 void shift_left(s21_decimal * value, int bits_count);
-void shift_left_1_bit(s21_decimal * value);
+int shift_left_1_bit(s21_decimal * value);
 int mul_by_10(s21_decimal * value);
 void align_scales(s21_decimal * value_1, s21_decimal * value_2);

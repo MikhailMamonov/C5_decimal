@@ -65,10 +65,13 @@ int set_byte(int num, int byte_index, unsigned char new_byte) {
     return num;
 }
 
-void shift_left_1_bit(s21_decimal * value){
+int shift_left_1_bit(s21_decimal * value){
     int overflow_0_to_1 = (value->bits[0]>>LAST_BIT)&SINGLE_BIT; 
     int overflow_1_to_2 = (value->bits[1]>>LAST_BIT)&SINGLE_BIT;
-
+    int overflow_all = 0;
+    if((value->bits[2]>> LAST_BIT)&1){
+        overflow_all = 1;
+    }
     value->bits[0] <<=SINGLE_BIT;
     value->bits[1] <<=SINGLE_BIT;
     value->bits[2] <<=SINGLE_BIT;
@@ -80,20 +83,27 @@ void shift_left_1_bit(s21_decimal * value){
     if(overflow_1_to_2){
         value->bits[2] |= overflow_1_to_2;
     }
+
+    return overflow_all;
 }
 
-void shift_left(s21_decimal * value, int bits_count){
+int shift_left(s21_decimal * value, int bits_count){
    for (int i =0;i<bits_count;i++){
-    shift_left_1_bit(value);
+    if(shift_left_1_bit(value)){
+        return 1;
+    }
    }
+
+   return 0;
 }
 
 int mul_by_10(s21_decimal * value){
     s21_decimal res_mul_by_8 = *value;
     s21_decimal res_mul_by_2 = *value;
 
-    shift_left(&res_mul_by_8, 3);
-    shift_left(&res_mul_by_2, 1);
+    if(shift_left(&res_mul_by_8, 3) || shift_left(&res_mul_by_2, 1)){
+        return 1;
+    }
 
     value->bits[0] = 0;
     value->bits[1] = 0;
@@ -166,8 +176,12 @@ void align_scales(s21_decimal * value_1, s21_decimal * value_2){
             }
 
             if (round_up){
-                s21_decimal one = {{1, 0, 0, 0}};
-                s21_decimal temp_res ={{0, 0, 0, 0}};
+                s21_decimal one = {0};
+                one.bits[0] = 1;
+                s21_decimal temp_res ={0};
+                set_sign(source, 0);
+                set_scale(source,0);
+
                 s21_add_mantissas(*source, one, &temp_res);
 
                 int current_sign = get_sign(source->bits[3]);

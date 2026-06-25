@@ -14,6 +14,8 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
     int final_scale = get_scale(value_1.bits[3]);
 
     result->bits[0] = result->bits[1] = result->bits[2] = result->bits[3] = 0;
+    s21_decimal *backup = result;
+
     int return_status = SUCCESS;
 
     if (sign_value_1 == sign_value_2)
@@ -21,12 +23,14 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
         int overflow = s21_add_mantissas(value_1, value_2, result);
         if (overflow)
         {
+            result = backup;
             if (sign_value_1)
             {
                 return_status = FAIL_TOO_SMALL;
             }
             else
             {
+                
                 return_status = FAIL_TOO_LARGE;
             }
         }
