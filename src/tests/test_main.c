@@ -10,7 +10,6 @@ Suite *div_suite_create(void);
 
 
 void assemble_srunner(SRunner *sr) {
-  srunner_add_suite(sr, add_suite_create());
   srunner_add_suite(sr, sub_suite_create());
   srunner_add_suite(sr, mul_suite_create());
   srunner_add_suite(sr, div_suite_create());
@@ -18,7 +17,7 @@ void assemble_srunner(SRunner *sr) {
 
 int main(void) {
   int failed = 0;
-  SRunner *sr = srunner_create(memchr_suite_create());
+  SRunner *sr = srunner_create(add_suite_create());
   assemble_srunner(sr);
 
   srunner_run_all(sr, CK_NORMAL);

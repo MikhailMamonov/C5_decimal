@@ -12,9 +12,10 @@ typedef struct {
 } addParams;
 
 typedef struct {
-  const char *src;
-  const char *str;
-  const char *expected;
+  const s21_decimal value1;
+  const s21_decimal value2;
+  const s21_decimal expected_result;
+  int expected_return_code; 
   const char *test_name;
 } subParams;
 
