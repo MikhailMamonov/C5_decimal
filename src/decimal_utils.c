@@ -1,6 +1,7 @@
 #include "decimal_utils.h"
-#include <cstddef>
+#include <stddef.h>
 
+int set_byte(int num, int byte_index, unsigned char new_byte);
 
 int get_sign(int service_bits){
     return (service_bits & SIGN_MASK) >> SIGN_BIT;
