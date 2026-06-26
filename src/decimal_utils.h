@@ -13,3 +13,4 @@ int s21_add_mantissas(s21_decimal value_1, s21_decimal value_2, s21_decimal * re
 void shift_left(s21_decimal * value, int bits_count);
 int shift_left_1_bit(s21_decimal * value);
 int mul_by_10(s21_decimal * value);
+int decimal_is_zero(s21_decimal value);

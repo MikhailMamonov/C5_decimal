@@ -210,3 +210,15 @@ void align_scales(s21_decimal * value_1, s21_decimal * value_2){
             }
     }
 }
+
+int decimal_is_zero(s21_decimal value){
+    int res = 0;
+    for(int i = 0;i<SIGNIFICANT_BYTES;i++){
+        if(value.bits[i]!=0){
+            res = 1;
+            break;
+        }
+    }
+
+    return res;
+}
