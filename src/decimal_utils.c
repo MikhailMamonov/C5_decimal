@@ -1,5 +1,6 @@
 #include "decimal_utils.h"
-#include <math.h>
+#include <cstddef>
+
 
 int get_sign(int service_bits){
     return (service_bits & SIGN_MASK) >> SIGN_BIT;
@@ -9,7 +10,7 @@ int get_scale(int service_bits){
     return (service_bits & EXP_MASK) >> SCALE_BIT;
  }
 
- int compare_mantissas(s21_decimal value_1, s21_decimal value_2) {
+  int compare_mantissas(s21_decimal value_1, s21_decimal value_2) {
     int res = 0;
     for (int i = SIGNIFICANT_BYTES - 1; i >= 0; i--) {
       unsigned int a = (unsigned int) value_1.bits[i];
@@ -26,6 +27,19 @@ int get_scale(int service_bits){
     return (int)res;
  }
 
+ int s21_add_mantissas(s21_decimal value_1, s21_decimal value_2, s21_decimal * result){
+    unsigned long long carry = 0;
+
+    for (int i=0;i<SIGNIFICANT_BYTES;i++){
+        unsigned long long sum = (unsigned long long)(unsigned int)value_1.bits[i] + 
+                                (unsigned long long)(unsigned int)value_2.bits[i] + carry;  
+        result->bits[i] = (int)(sum & MAX_MASK);
+        carry = sum >> BITS_IN_INT;
+    }
+
+    return (int)carry;
+ }
+
  int substract_mantissas(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     unsigned long long borrow = 0;
 
@@ -34,7 +48,7 @@ int get_scale(int service_bits){
         unsigned int value_2_unsigned = (unsigned int)value_2.bits[i];
         unsigned long long diff = (unsigned long long)value_1_unsigned - value_2_unsigned - borrow;
 
-        if (diff > MAX_UNSIGNED_LONG) {
+        if (diff > 0xFFFFFFFFULL) {
             borrow = 1;
             result->bits[i] = (int)(unsigned int)(diff & MAX_MASK);
         } else {
@@ -44,25 +58,6 @@ int get_scale(int service_bits){
     }
     return (int)borrow;
 }
-
-
- int will_addition_overflow(s21_decimal value_1, s21_decimal value_2){
-    unsigned int stock0 = MAX_MASK - (unsigned int)value_1.bits[0]; 
-    unsigned int stock1 = MAX_MASK - (unsigned int)value_1.bits[1];
-    unsigned int stock2 = MAX_MASK - (unsigned int)value_1.bits[2];
-
-    unsigned int value_2_bits_0 = (unsigned int)value_2.bits[0];
-    unsigned int value_2_bits_1 = (unsigned int)value_2.bits[1];
-    unsigned int value_2_bits_2 = (unsigned int)value_2.bits[2];
-
-    
-    if(stock2 < value_2_bits_2 ||
-     (stock2==value_2_bits_2 && stock1<value_2_bits_1) || 
-     (stock2==value_2_bits_2&&stock1==value_2_bits_1 && stock0<value_2_bits_0 )){
-        return 1;
-    }
-    return 0;
- }
 
 void set_sign(s21_decimal *value, int sign) {
    int byte_value = SIGN_POSITIVE;
@@ -130,3 +125,131 @@ s21_decimal add_one(s21_decimal num) {
     return num;
 }
 
+int shift_left_1_bit(s21_decimal * value){
+    unsigned int *b = (unsigned int *)value->bits;
+    
+    int overflow_0_to_1 = (b[0]>>LAST_BIT)&SINGLE_BIT; 
+    int overflow_1_to_2 = (b[1]>>LAST_BIT)&SINGLE_BIT;
+    int overflow_all = (b[2]>> LAST_BIT)&SINGLE_BIT;
+    b[0] <<=SINGLE_BIT;
+    b[1] <<=SINGLE_BIT;
+    b[2] <<=SINGLE_BIT;
+
+    if(overflow_0_to_1){
+        b[1] |= 1u;
+    }
+
+    if(overflow_1_to_2){
+        b[2]|= 1u;
+    }
+
+    return overflow_all;
+}
+
+int shift_left(s21_decimal * value, int bits_count){
+   for (int i =0;i<bits_count;i++){
+    if(shift_left_1_bit(value)){
+        return 1;
+    }
+   }
+
+   return 0;
+}
+
+int mul_by_10(s21_decimal * value){
+    s21_decimal res_mul_by_8 = *value;
+    s21_decimal res_mul_by_2 = *value;
+
+    if(shift_left(&res_mul_by_8, 3) || shift_left(&res_mul_by_2, 1)){
+        return 1;
+    }
+
+    value->bits[0] = 0;
+    value->bits[1] = 0;
+    value->bits[2] = 0;
+
+   return s21_add_mantissas(res_mul_by_8, res_mul_by_2, value);
+}
+
+void align_scales(s21_decimal * value_1, s21_decimal * value_2){
+    int scale_1 = get_scale(value_1->bits[3]);
+    int scale_2 = get_scale(value_2->bits[3]);
+
+    int isOverflow = 0;
+    int existNonNull = 0;
+
+    s21_decimal backup_1 = *value_1;
+    s21_decimal backup_2 = *value_2;
+
+    while (scale_1 != scale_2 && !isOverflow){
+        s21_decimal *target = (scale_1 < scale_2) ? value_1 : value_2;
+        int *target_scale   = (scale_1 < scale_2) ? &scale_1 : &scale_2;
+
+        if(mul_by_10(target)){
+            isOverflow = 1;
+        }
+        else{
+            (*target_scale)++;
+            set_scale(target, *target_scale);
+        }
+    }
+
+    if(isOverflow){
+        *value_1 = backup_1;
+        *value_2 = backup_2;
+        scale_1 = get_scale(value_1->bits[3]);
+        scale_2 = get_scale(value_2->bits[3]);
+
+        int round_up = 0;
+        s21_decimal *source = NULL;
+
+        int remainder = 0;
+        while (scale_1 != scale_2){
+            if (remainder != 0) {
+                existNonNull = 1;
+            }
+            source = (scale_1 > scale_2) ? value_1 : value_2;
+            int * source_scale = (scale_1 > scale_2) ? &scale_1 : &scale_2;
+            
+            remainder = div_by_10(source);
+            
+            (*source_scale)--;
+            set_scale(source, *source_scale);
+        }
+
+        if(remainder>=ROUND_THRESHOLD){
+             if(remainder > ROUND_THRESHOLD){
+                round_up = 1;
+            }
+            else if(remainder == ROUND_THRESHOLD){
+                if(existNonNull){
+                    round_up= 1;    
+                }
+                //.5 clear digit -> Banking round
+                else {
+                    if ((unsigned int)source->bits[0] & 1) {
+                        round_up = 1;
+                    }     
+                }
+            }
+            }
+
+            if (round_up){
+                s21_decimal one = {0};
+                one.bits[0] = 1;
+                s21_decimal temp_res ={0};
+                set_sign(source, 0);
+                set_scale(source,0);
+
+                s21_add_mantissas(*source, one, &temp_res);
+
+                int current_sign = get_sign(source->bits[3]);
+                int current_scale = get_scale(source->bits[3]);
+
+                *source = temp_res;
+
+                set_sign(source, current_sign);
+                set_scale(source,current_scale);
+            }
+    }
+}

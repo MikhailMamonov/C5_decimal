@@ -1,8 +1,8 @@
 #define COUNT_OF_BITS 4
 #define SIGNIFICANT_BYTES 3
+#define SUCCESS 0
 #define SIGN_NEGATIVE 1
 #define SIGN_POSITIVE 0
-#define SUCCESS 0
 #define FAIL_TOO_LARGE 1
 #define FAIL_TOO_SMALL 2
 #define FAIL_DIVIDE_ZERO 3
@@ -14,17 +14,16 @@
 #define SCALE_BIT 16 
 #define NEGATIVE_BYTE_VALUE 128
 #define SCALE_BYTE_IDX 2
-#define SIGN_BYTE_IDX 3
 #define BITS_IN_BYTE 8
 #define ELDER_BIT 95
+#define SIGN_BYTE_IDX 3
 #define BITS_IN_INT 32
-
+#define ROUND_THRESHOLD 5
 
 typedef struct 
 {
     int bits[4];
 } s21_decimal;
-
 
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
