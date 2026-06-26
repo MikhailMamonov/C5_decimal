@@ -81,11 +81,15 @@ SUB_TEST_CASES(sub_bankers_rounding_down, {
 })
 
 SUB_TEST_CASES(sub_bankers_rounding_to_even, {
-  .value1 = {{0x00000019, 0x00000000, 0x00000000, 0x00000000}}, // 25 (нечетное)
-  .value2 = {{0x00000032, 0x00000000, 0x00000000, 0x001C0000}}, // 0.0000000000000000000000000050 (scale 28, чистая половина)
-  .expected_result = {{0x0000001A, 0x00000000, 0x00000000, 0x00000000}}, // 26 (округлилось вверх к ближайшему четному)
+  // value1 = MAX_DECIMAL (scale 0) — его невозможно умножить на 10!
+  .value1 = {{0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000}}, 
+  // value2 = 1.5 (мантисса 15, scale 1) — ему придется уменьшать масштаб до 0
+  .value2 = {{0x0000000F, 0x00000000, 0x00000000, 0x00010000}}, 
+  // В процессе выравнивания 1.5 округлится вверх до 2 (так как 1 — нечетное)
+  // Ожидаемый результат: MAX_DECIMAL - 2
+  .expected_result = {{0xFFFFFFFD, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000}}, 
   .expected_return_code = 0,
-  .test_name = "10 + (-4) = 6"
+  .test_name = "MAX_DECIMAL - 1.5 (1.5 округляется до 2 из-за невозможности выровнять scale)"
 })
 
 
@@ -119,7 +123,7 @@ Suite *sub_suite_create(void) {
   tcase_add_test(tc, sub_zero_result_preserves_scale);
   tcase_add_test(tc, sub_bankers_rounding_down);
   tcase_add_test(tc, sub_bankers_rounding_to_even);
-  tcase_add_test(tc, sub_overflow_to_infinity);
+  tcase_add_test(tc, sub_result_goes_negative);
   tcase_add_test(tc, sub_overflow_to_negative_infinity);
   tcase_add_test(tc, sub_mixed_negative);
   suite_add_tcase(s, tc);
