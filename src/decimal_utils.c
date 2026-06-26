@@ -1,6 +1,7 @@
 #include "decimal_utils.h"
 #include <cstddef>
 
+
 int get_sign(int service_bits){
     return (service_bits & SIGN_MASK) >> SIGN_BIT;
  }
@@ -79,6 +80,48 @@ int set_byte(int num, int byte_index, unsigned char new_byte) {
 
     num = num | (new_byte << shift);
 
+    return num;
+}
+
+int div_by_10(s21_decimal *num) {
+    int remainder = 0;
+    s21_decimal copy = *num;
+    for (int i = 0; i < SIGNIFICANT_BYTES; i++) {
+        num->bits[i] = 0;
+    }
+    for (int i = ELDER_BIT; i >= 0; i--) {
+            int curr_byte = i / BITS_IN_INT;
+            int bit_num = i % BITS_IN_INT;
+            unsigned int bit_mask = 1 << bit_num;
+            unsigned int bit = ((unsigned int)copy.bits[curr_byte] & bit_mask) >> bit_num;
+            remainder = remainder << 1;
+            remainder += bit;
+            if (remainder >= 10) {
+                remainder -= 10;
+                num->bits[curr_byte] = num->bits[curr_byte] | bit_mask;
+            }
+    }
+    /*if (remainder > 5) {
+        answer = add_one(answer);
+    } else if (remainder == 5) {
+        int even = 0;
+        int first_bit_mask = 1;
+        if (answer.bits[0] & first_bit_mask) {
+            answer = add_one(answer);
+        }
+    }*/
+    return remainder;
+}
+
+s21_decimal add_one(s21_decimal num) {
+    s21_decimal one;
+    one.bits[0] = 1;
+    for (int i = 1 ; i <= SIGNIFICANT_BYTES; i++) {
+        one.bits[i] = 0;
+    }
+    set_scale(&one, 0);
+    set_sign(&one, SIGN_POSITIVE);
+    s21_add(num, one, &num);
     return num;
 }
 
