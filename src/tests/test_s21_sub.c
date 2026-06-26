@@ -116,16 +116,16 @@ Suite *sub_suite_create(void) {
   Suite *s = suite_create("Substract");
   TCase *tc = tcase_create("core");
 
-  tcase_add_test(tc, sub_two_positives_basic);
-  tcase_add_test(tc, sub_result_goes_negative);
-  tcase_add_test(tc, sub_two_negatives);
-  tcase_add_test(tc, sub_different_scales_simple);
-  tcase_add_test(tc, sub_zero_result_preserves_scale);
-  tcase_add_test(tc, sub_bankers_rounding_down);
-  tcase_add_test(tc, sub_bankers_rounding_to_even);
-  tcase_add_test(tc, sub_result_goes_negative);
-  tcase_add_test(tc, sub_overflow_to_negative_infinity);
-  tcase_add_test(tc, sub_mixed_negative);
+  tcase_add_test(tc, test_sub_two_positives_basic);
+  tcase_add_test(tc, test_sub_result_goes_negative);
+  tcase_add_test(tc, test_sub_two_negatives);
+  tcase_add_test(tc, test_sub_different_scales_simple);
+  tcase_add_test(tc, test_sub_zero_result_preserves_scale);
+  tcase_add_test(tc, test_sub_bankers_rounding_down);
+  tcase_add_test(tc, test_sub_bankers_rounding_to_even);
+  tcase_add_test(tc, test_sub_result_goes_negative);
+  tcase_add_test(tc, test_sub_overflow_to_negative_infinity);
+  tcase_add_test(tc, test_sub_mixed_negative);
   suite_add_tcase(s, tc);
   return s;
 }

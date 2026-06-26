@@ -68,7 +68,7 @@ ADD_TEST_CASES(add_mixed_negative, {
 
 
 
-Suite *to_lower_suite_create(void) {
+Suite *add_suite_create(void) {
   Suite *s = suite_create("to_lower");
   TCase *tc = tcase_create("core");
 
