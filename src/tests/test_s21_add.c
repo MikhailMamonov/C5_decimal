@@ -5,15 +5,6 @@
 #include "../s21_decimal.h"
 #include "test_s21_common.h"
 
-static int compare_decimal(const s21_decimal a, const s21_decimal b){
-    for (int i=0;i<COUNT_OF_BITS;i++){
-        if(a.bits[i]!=b.bits[i]){
-            return 0;
-        }
-    }
-
-    return 1;
-}
 
 static void run_add_test(addParams *params) {
   s21_decimal result = {0};
@@ -21,12 +12,17 @@ static void run_add_test(addParams *params) {
   int return_code = s21_add(params->value1, params->value2, &result);
 
   ck_assert_int_eq(return_code, params->expected_return_code);
+  
+  char str_res[128] = {0};
+  char str_exp[128] = {0};
 
-  if(return_code==SUCCESS){
-    ck_assert_msg(compare_decimal(result, params->expected_result),
-        "test '%s' failed: result not match with expected.",
-        params->test_name);
-  }
+  decimal_to_string(result, str_res);
+  decimal_to_string(params->expected_result, str_exp);
+
+  ck_assert_msg(compare_decimal(result, params->expected_result),
+      " FAIL [%s]:\n result_code = '%d' expected_return_code = '%d'\n result = '%s'\n expected = '%s'.",
+      params->test_name, return_code, params->expected_return_code, str_res, str_exp);
+
   printf("[PASS] %s\n", params->test_name);
 }
 

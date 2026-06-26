@@ -53,4 +53,7 @@ typedef struct {
 #define DIV_TEST_CASES(name, ...) \
   TEST_CASES(name, divParams, run_div_test)
 
+void decimal_to_string(const s21_decimal a, char * buffer);
+int compare_decimal(const s21_decimal a, const s21_decimal b);
+
 #endif
