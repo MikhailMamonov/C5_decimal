@@ -11,17 +11,17 @@ int get_scale(int service_bits){
     return (service_bits & EXP_MASK) >> SCALE_BIT;
  }
 
-  int compare_mantissas(s21_decimal value_1, s21_decimal value_2) {
+int compare_mantissas(s21_decimal value_1, s21_decimal value_2) {
     int res = 0;
     for (int i = SIGNIFICANT_BYTES - 1; i >= 0; i--) {
       unsigned int a = (unsigned int) value_1.bits[i];
       unsigned int b = (unsigned int) value_2.bits[i];
       if (a > b) {
-            res = SIGN_POSITIVE; 
+            res = 1; 
             break;
         }
         if (a < b) {
-            res = SIGN_NEGATIVE; 
+            res = -1; 
             break;
         }
     }

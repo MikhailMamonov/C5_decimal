@@ -18,7 +18,7 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     if(get_sign(value_1.bits[SIGN_BYTE_IDX]) != get_sign(value_2.bits[SIGN_BYTE_IDX]) && !will_addition_overflow) {
         set_sign(&local_result, get_sign(value_1.bits[SIGN_BYTE_IDX]));
     } else {
-        if (will_addition_overflow) {
+        if (get_sign(value_1.bits[SIGN_BYTE_IDX]) != get_sign(value_2.bits[SIGN_BYTE_IDX]) && will_addition_overflow) {
             if (get_sign(value_1.bits[SIGN_BYTE_IDX]) == SIGN_POSITIVE) {
                 result_status = FAIL_TOO_LARGE;
             } else {

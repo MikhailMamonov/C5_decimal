@@ -100,6 +100,46 @@ SUB_TEST_CASES(sub_mixed_negative, {
   .test_name = "5 - (-12) = 17"
 })
 
+SUB_TEST_CASES(sub_minus_zero_and_scale, {
+  .value1 = {{0x00000005, 0x00000000, 0x00000000, 0x80020000}}, // -0.05 (scale 2)
+  .value2 = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, // 0 (scale 0)
+  .expected_result = {{0x00000005, 0x00000000, 0x00000000, 0x80020000}}, // -0.05 (scale 2)
+  .expected_return_code = 0,
+  .test_name = "-0.05 - 0 = -0.05"
+})
+
+SUB_TEST_CASES(sub_from_zero_negative, {
+  .value1 = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, // 0 (scale 0)
+  .value2 = {{0x00000037, 0x00000000, 0x00000000, 0x80010000}}, // -5.5 (scale 1, мантисса 55)
+  .expected_result = {{0x00000037, 0x00000000, 0x00000000, 0x00010000}}, // 5.5 (scale 1, мантисса 55)
+  .expected_return_code = 0,
+  .test_name = "0 - (-5.5) = 5.5"
+})
+
+SUB_TEST_CASES(sub_max_scale_difference, {
+  .value1 = {{0x0000000A, 0x00000000, 0x00000000, 0x00000000}}, // 10 (scale 0)
+  .value2 = {{0x00000002, 0x00000000, 0x00000000, 0x001C0000}}, // 2e-28 (scale 28)
+  .expected_result = {{0x0000000A, 0x00000000, 0x00000000, 0x00000000}}, // 10 (scale 0, усечение без округления)
+  .expected_return_code = 0,
+  .test_name = "10 - 2e-28 = 10"
+})
+
+SUB_TEST_CASES(sub_extreme_small_zero, {
+  .value1 = {{0x00000002, 0x00000000, 0x00000000, 0x001C0000}}, // 2e-28 (scale 28)
+  .value2 = {{0x00000002, 0x00000000, 0x00000000, 0x001C0000}}, // 2e-28 (scale 28)
+  .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x001C0000}}, // 0e-28 (scale 28, сохранение экспоненты)
+  .expected_return_code = 0,
+  .test_name = "2e-28 - 2e-28 = 0e-28"
+})
+
+SUB_TEST_CASES(sub_overflow_minus_max, {
+  .value1 = {{0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x80000000}}, // -MAX_DECIMAL
+  .value2 = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // +1
+  .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, 
+  .expected_return_code = 2, // FAIL_TOO_SMALL (уход в минус бесконечность)
+  .test_name = "-MAX_DECIMAL - 1 = Underflow"
+})
+
 
 
 Suite *sub_suite_create(void) {
@@ -116,6 +156,11 @@ Suite *sub_suite_create(void) {
   tcase_add_test(tc, test_sub_result_goes_negative);
   tcase_add_test(tc, test_sub_overflow_to_negative_infinity);
   tcase_add_test(tc, test_sub_mixed_negative);
+  tcase_add_test(tc, test_sub_minus_zero_and_scale);
+  tcase_add_test(tc, test_sub_from_zero_negative);
+  tcase_add_test(tc, test_sub_max_scale_difference);
+  tcase_add_test(tc, test_sub_extreme_small_zero);
+  tcase_add_test(tc, test_sub_overflow_minus_max);
   suite_add_tcase(s, tc);
   return s;
 }
