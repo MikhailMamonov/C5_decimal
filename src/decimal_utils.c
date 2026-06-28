@@ -254,3 +254,14 @@ void align_scales(s21_decimal * value_1, s21_decimal * value_2){
             }
     }
 }
+
+
+int get_bit_val(s21_decimal value, int idx) {
+    int curr_byte = idx / BITS_IN_INT;
+    int bit_num = idx % BITS_IN_INT;
+    unsigned int bit_mask = 1 << bit_num;
+    unsigned int bit = ((unsigned int)value.bits[curr_byte] & bit_mask) >> bit_num;
+
+    return (int)bit;
+}
+
