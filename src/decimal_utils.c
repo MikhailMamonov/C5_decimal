@@ -26,7 +26,7 @@ int compare_mantissas(s21_decimal value_1, s21_decimal value_2) {
         }
     }
     return (int)res;
- }
+}
 
  int s21_add_mantissas(s21_decimal value_1, s21_decimal value_2, s21_decimal * result){
     unsigned long long carry = 0;
@@ -264,4 +264,17 @@ int get_bit_val(s21_decimal value, int idx) {
 
     return (int)bit;
 }
+
+int decimal_is_zero(s21_decimal value) {
+    int is_zero = 1;
+    for(int i = 0;i<SIGNIFICANT_BYTES;i++){
+        if(value.bits[i]!=0){
+            is_zero = 0;
+            break;
+        }
+    }
+
+    return is_zero;
+}
+
 

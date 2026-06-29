@@ -38,25 +38,7 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
         }
     }
 
-    int exist_not_zero = 0, remainder = 0;
-    while (result_scale > MAX_SCALE || (!fits_in_decimal(local_result) && result_scale > 0)) {
-        if (remainder > 0) {
-            exist_not_zero = 1;
-        }
-        remainder = big_div_by_10(&local_result);
-        result_scale--;
-    }
-    if (remainder > ROUND_THRESHOLD || (remainder == ROUND_THRESHOLD && exist_not_zero)) {
-        big_add_one(&local_result);
-    } else if (remainder == ROUND_THRESHOLD) {
-        if (local_result.bits[0] & 1) {
-            big_add_one(&local_result);
-        }
-    }
-    if (!fits_in_decimal(local_result)) {
-        result_status = fail;
-    }
-    
+    result_status = check_result(&local_result, &result_scale, fail);
 
     if (result_status == SUCCESS) {
         *result = assign_back(local_result);

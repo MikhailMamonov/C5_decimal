@@ -5,14 +5,14 @@
 // standart library functions
 Suite *add_suite_create(void);
 Suite *sub_suite_create(void);
-//Suite *mul_suite_create(void);
-//Suite *div_suite_create(void);
+Suite *mul_suite_create(void);
+Suite *div_suite_create(void);
 
 
 void assemble_srunner(SRunner *sr) {
   srunner_add_suite(sr, sub_suite_create());
-  // srunner_add_suite(sr, mul_suite_create());
-  // srunner_add_suite(sr, div_suite_create());
+  srunner_add_suite(sr, mul_suite_create());
+  srunner_add_suite(sr, div_suite_create());
 }
 
 int main(void) {
