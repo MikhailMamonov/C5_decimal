@@ -21,6 +21,9 @@ typedef enum {
     COMPARE_GREATER_OR_EQUAL
 } CompareType;
 
+void decimal_to_string(s21_decimal dec, char *str);
+int compare_decimal(s21_decimal a, s21_decimal b);
+
 #define TEST_CASES(name, param_type, run_func, ...)                      \
   static param_type name[] = {__VA_ARGS__};                              \
   START_TEST(test_##name) {                                              \
@@ -42,27 +45,23 @@ typedef enum {
 #define DIV_TEST_CASES(name, ...) \
   TEST_CASES(name, TestParams, run_div_test, __VA_ARGS__)
 
-#define COMPARE_TEST_CASES(name, compare_type, ...) \
-    switch (compare_type) { \
-        case COMPARE_EQUAL: \
-            TEST_CASES(name, TestParams, run_compare_equal_test, __VA_ARGS__); \
-            break; \
-        case COMPARE_NOT_EQUAL: \
-            TEST_CASES(name, TestParams, run_compare_not_equal_test, __VA_ARGS__); \
-            break; \
-        case COMPARE_LESS: \
-            TEST_CASES(name, TestParams, run_compare_less_test, __VA_ARGS__); \
-            break; \
-        case COMPARE_LESS_OR_EQUAL: \
-            TEST_CASES(name, TestParams, run_compare_less_or_equal_test, __VA_ARGS__); \
-            break; \
-        case COMPARE_GREATER: \
-            TEST_CASES(name, TestParams, run_compare_greater_test, __VA_ARGS__); \
-            break; \
-        case COMPARE_GREATER_OR_EQUAL: \
-            TEST_CASES(name, TestParams, run_compare_greater_or_equal_test, __VA_ARGS__); \
-            break; \
-        default: \
-            break; \
-    }
+// Отдельные макросы для каждой функции сравнения
+#define COMPARE_EQUAL_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_compare_equal_test, __VA_ARGS__)
+
+#define COMPARE_NOT_EQUAL_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_compare_not_equal_test, __VA_ARGS__)
+
+#define COMPARE_LESS_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_compare_less_test, __VA_ARGS__)
+
+#define COMPARE_LESS_OR_EQUAL_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_compare_less_or_equal_test, __VA_ARGS__)
+
+#define COMPARE_GREATER_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_compare_greater_test, __VA_ARGS__)
+
+#define COMPARE_GREATER_OR_EQUAL_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_compare_greater_or_equal_test, __VA_ARGS__)
+
 #endif
