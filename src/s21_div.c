@@ -1,7 +1,8 @@
 #include "decimal_utils.h"
 #include "big_decimal.h"
 
-void division_cycle(big_decimal dividend, big_decimal divider, big_decimal *remainder, big_decimal *result);
+void division_cycle(big_decimal dividend, big_decimal divider, big_decimal *remainder, big_decimal *result, int last_bit);
+int find_last_bit(big_decimal value_1);
 
 int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     big_decimal local_value_1 = assign(value_1);
@@ -29,19 +30,22 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     }
     int result_status = SUCCESS;
 
-    division_cycle(local_value_1, local_value_2, &remainder, &local_result);
+    int last_usable_bit = find_last_bit(local_value_1);
 
-    while (!equals_zero(remainder) && res_scale < MAX_SCALE) {
+    division_cycle(local_value_1, local_value_2, &remainder, &local_result, last_usable_bit);
+
+    while (!equals_zero(remainder) && res_scale <= MAX_SCALE) {
         big_mul_by_10(&local_result);
         big_mul_by_10(&remainder);
         local_value_1 = remainder;
+        last_usable_bit = find_last_bit(local_value_1);
         for (int i = 0; i < BIG_SIGNIFICANT_BYTES; i++) {
             remainder.bits[i] = 0;
         }
         res_scale++;
         big_decimal digit_result = {0};
 
-        division_cycle(local_value_1, local_value_2, &remainder, &digit_result);
+        division_cycle(local_value_1, local_value_2, &remainder, &digit_result, BIG_ELDER_BIT);
         big_add_mantissas(local_result, digit_result, &local_result);
     }
 
@@ -56,17 +60,31 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     return result_status;
 }
 
-void division_cycle(big_decimal dividend, big_decimal divider, big_decimal *remainder, big_decimal *result) {
-    for (int i = BIG_ELDER_BIT; i >= 0; i--) {
+void division_cycle(big_decimal dividend, big_decimal divider, big_decimal *remainder, big_decimal *result, int last_bit) {
+    for (int i = last_bit; i >= 0; i--) {
         int bit = big_get_bit_val(dividend, i);
-        big_shift_left_1_bit(result);
         big_shift_left_1_bit(remainder);
         if (bit) {
             big_add_one(remainder);
         }
         if (big_is_greater_or_equal(*remainder, divider)) {
             big_substract_mantissas(*remainder, divider, remainder);
-            big_add_one(result);
+            int curr_byte = i / BITS_IN_INT;
+            int bit_num = i % BITS_IN_INT;
+            unsigned int bit_mask = 1 << bit_num;
+            result->bits[curr_byte] = result->bits[curr_byte] | bit_mask;
         }
     }
+}
+
+int find_last_bit(big_decimal value_1) {
+    int last_usable_bit = 0;
+    for (int i = BIG_ELDER_BIT; i >= 0; i--) {
+        int bit = big_get_bit_val(value_1, i);
+        if (bit == 1) {
+            last_usable_bit = i;
+            break;
+        }
+    }
+    return last_usable_bit;
 }

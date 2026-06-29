@@ -5,29 +5,23 @@
 #include "../s21_decimal.h"
 #include "test_s21_common.h"
 
-static int compare_decimal(const s21_decimal *a, const s21_decimal *b){
-    for (int i=0;i<COUNT_OF_BITS;i++){
-        if(a->bits[i]!=b->bits[i]){
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
 static void run_div_test(TestParams *params) {
   s21_decimal result = {{0}};
 
-  int return_code = s21_add(params->value1, params->value2, &result);
+  int return_code = s21_div(params->value1, params->value2, &result);
 
   ck_assert_int_eq(return_code, params->expected_return_code);
 
+  char str_res[128] = {0};
+  char str_exp[128] = {0};
+
+  decimal_to_string(result, str_res);
+  decimal_to_string(params->expected_result, str_exp);
+
   if(return_code==SUCCESS){
-    ck_assert_msg(compare_decimal(&result, &params->expected_result),
-        "test '%s' failed: result not match with expected.",
-        params->test_name);
-    ck_assert_ptr_ne((void *)&result, (void *)&params->value1);
-    ck_assert_ptr_ne((void *)&result, (void *)&params->value2);
+    ck_assert_msg(compare_decimal(result, params->expected_result),
+      " FAIL [%s]:\n result_code = '%d' expected_return_code = '%d'\n result = '%s'\n expected = '%s'.",
+      params->test_name, return_code, params->expected_return_code, str_res, str_exp);
   }
   printf("[PASS] %s\n", params->test_name);
 }
@@ -84,8 +78,8 @@ DIV_TEST_CASES(div_fractional_loop, {
   .value1 = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
   .value2 = {{0x00000003, 0x00000000, 0x00000000, 0x00000000}}, // 3
   // 1/3 = 0.3333333333333333333333333333 (28 троек, масштаб 28)
-  // В шестнадцатеричной системе мантисса 28 троек равна 0x1A14E3BC 0x2AFA0E5B 0x3D75A035
-  .expected_result = {{0x2AFA0E5B, 0x3D75A035, 0x1A14E3BC, 0x001C0000}}, // 28 троек, scale 28
+  // Истинное шестнадцатеричное значение 28 троек:
+  .expected_result = {{0x05555555, 0x14B700CB, 0x0AC544CA, 0x001C0000}}, 
   .expected_return_code = 0,
   .test_name = "1 / 3 = 0.333... (max scale generation)"
 })
@@ -130,6 +124,42 @@ DIV_TEST_CASES(div_overflow_to_negative_infinity, {
   .test_name = "(-MAX_DECIMAL) / 0.1 = Underflow (-inf)"
 })
 
+DIV_TEST_CASES(div_periodic_seven, {
+  .value1 = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
+  .value2 = {{0x00000007, 0x00000000, 0x00000000, 0x00000000}}, // 7
+  // 1 / 7 = 0.1428571428571428571428571424... (период 142857)
+  // Истинное шестнадцатеричное значение 28 знаков этого периода:
+  .expected_result = {{0x94924924, 0x5205497B, 0x049DAFC4, 0x001C0000}}, // scale 28
+  .expected_return_code = 0,
+  .test_name = "1 / 7 = 0.142857... (bankers rounded period)"
+})
+
+DIV_TEST_CASES(div_max_by_max, {
+  .value1 = {{0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000}}, // MAX_DECIMAL
+  .value2 = {{0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000}}, // MAX_DECIMAL
+  .expected_result = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1 (scale 0)
+  .expected_return_code = 0,
+  .test_name = "MAX_DECIMAL / MAX_DECIMAL = 1"
+})
+
+DIV_TEST_CASES(div_scale_jump, {
+  .value1 = {{0x00000005, 0x00000000, 0x00000000, 0x00010000}}, // 0.5 (scale 1, мантисса 5)
+  .value2 = {{0x00000002, 0x00000000, 0x00000000, 0x00020000}}, // 0.02 (scale 2, мантисса 2)
+  // 0.5 / 0.02 = 25. Стартовый scale 1 - 2 = -1 -> выравнивается до 0 (мантисса 50). 50 / 2 = 25.
+  .expected_result = {{0x00000019, 0x00000000, 0x00000000, 0x00000000}}, // 25 (scale 0)
+  .expected_return_code = 0,
+  .test_name = "0.5 / 0.02 = 25 (negative scale normalization)"
+})
+
+DIV_TEST_CASES(div_underflow_to_zero, {
+  .value1 = {{0x00000001, 0x00000000, 0x00000000, 0x001C0000}}, // 1e-28 (scale 28)
+  .value2 = {{0x0000000A, 0x00000000, 0x00000000, 0x00000000}}, // 10 (scale 0)
+  // 1e-28 / 10 = 1e-29 -> scale 29 превышает лимит. check_result делит 1 на 10 -> получаем 0, остаток 1.
+  .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x001C0000}}, // 0e-28 (чистый ноль со scale 28)
+  .expected_return_code = 0,
+  .test_name = "1e-28 / 10 = 0e-28 (underflows safely to zero)"
+})
+
 
 
 Suite *div_suite_create(void) {
@@ -147,6 +177,10 @@ Suite *div_suite_create(void) {
   tcase_add_test(tc, test_div_bankers_round_hold);
   tcase_add_test(tc, test_div_overflow_to_infinity);
   tcase_add_test(tc, test_div_overflow_to_negative_infinity);
+  tcase_add_test(tc, test_div_periodic_seven);
+  tcase_add_test(tc, test_div_max_by_max);
+  tcase_add_test(tc, test_div_scale_jump);
+  tcase_add_test(tc, test_div_underflow_to_zero);
   suite_add_tcase(s, tc);
   return s;
 }

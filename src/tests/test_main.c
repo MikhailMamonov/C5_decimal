@@ -19,6 +19,7 @@ int main(void) {
   int failed = 0;
   SRunner *sr = srunner_create(add_suite_create());
   assemble_srunner(sr);
+  srunner_set_fork_status(sr, CK_NOFORK);
 
   srunner_run_all(sr, CK_NORMAL);
   failed = srunner_ntests_failed(sr);

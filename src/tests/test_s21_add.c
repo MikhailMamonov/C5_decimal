@@ -6,7 +6,7 @@
 #include "test_s21_common.h"
 
 
-static void run_add_test(addParams *params) {
+static void run_add_test(TestParams *params) {
   s21_decimal result = {0};
 
   int return_code = s21_add(params->value1, params->value2, &result);
