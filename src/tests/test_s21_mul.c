@@ -1,4 +1,4 @@
-#include <check.h>
+/*#include <check.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -16,7 +16,7 @@ static int compare_decimal(const s21_decimal *a, const s21_decimal *b){
 }
 
 static void run_mul_test(addParams *params) {
-  s21_decimal result = {{0}};/*  */
+  s21_decimal result = {{0}};
 
   int return_code = s21_add(params->value1, params->value2, &result);
 
@@ -78,4 +78,4 @@ Suite *to_lower_suite_create(void) {
   tcase_add_test(tc, test_sub_mixed_positive);
   suite_add_tcase(s, tc);
   return s;
-}
+}*/

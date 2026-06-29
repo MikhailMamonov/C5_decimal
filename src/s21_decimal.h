@@ -1,3 +1,6 @@
+#ifndef S21_DECIMAL_H
+#define S21_DECIMAL_H
+
 #define COUNT_OF_BITS 4
 #define SIGNIFICANT_BYTES 3
 #define SUCCESS 0
@@ -15,6 +18,7 @@
 #define NEGATIVE_BYTE_VALUE 128
 #define SCALE_BYTE_IDX 2
 #define BITS_IN_BYTE 8
+#define ELDER_BIT 95
 #define SIGN_BYTE_IDX 3
 #define BITS_IN_INT 32
 #define ROUND_THRESHOLD 5
@@ -33,3 +37,5 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 #include "s21_comparison.h"
 #include "decimal_utils.h"
 
+
+#endif
