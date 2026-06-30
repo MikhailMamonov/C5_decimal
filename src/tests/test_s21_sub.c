@@ -5,7 +5,7 @@
 #include "../s21_decimal.h"
 #include "test_s21_common.h"
 
-static void run_sub_test(subParams *params) {
+static void run_sub_test(TestParams *params) {
   s21_decimal result;
 
   result.bits[0] = result.bits[1] = result.bits[2] = result.bits[3] = 0;

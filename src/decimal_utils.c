@@ -26,7 +26,7 @@ int compare_mantissas(s21_decimal value_1, s21_decimal value_2) {
         }
     }
     return (int)res;
- }
+}
 
  int s21_add_mantissas(s21_decimal value_1, s21_decimal value_2, s21_decimal * result){
     unsigned long long carry = 0;
@@ -254,3 +254,27 @@ void align_scales(s21_decimal * value_1, s21_decimal * value_2){
             }
     }
 }
+
+
+int get_bit_val(s21_decimal value, int idx) {
+    int curr_byte = idx / BITS_IN_INT;
+    int bit_num = idx % BITS_IN_INT;
+    unsigned int bit_mask = 1 << bit_num;
+    unsigned int bit = ((unsigned int)value.bits[curr_byte] & bit_mask) >> bit_num;
+
+    return (int)bit;
+}
+
+int decimal_is_zero(s21_decimal value) {
+    int is_zero = 1;
+    for(int i = 0;i<SIGNIFICANT_BYTES;i++){
+        if(value.bits[i]!=0){
+            is_zero = 0;
+            break;
+        }
+    }
+
+    return is_zero;
+}
+
+

@@ -22,6 +22,9 @@
 #define SIGN_BYTE_IDX 3
 #define BITS_IN_INT 32
 #define ROUND_THRESHOLD 5
+#define MAX_SCALE 28
+#define LAST_BIT 31
+#define SINGLE_BIT 1
 
 typedef struct 
 {

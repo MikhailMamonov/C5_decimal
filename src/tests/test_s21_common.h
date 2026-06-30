@@ -9,28 +9,7 @@ typedef struct {
   const s21_decimal expected_result;
   int expected_return_code; 
   const char *test_name;
-} addParams;
-
-typedef struct {
-  const s21_decimal value1;
-  const s21_decimal value2;
-  const s21_decimal expected_result;
-  int expected_return_code; 
-  const char *test_name;
-} subParams;
-
-typedef struct {
-  const char *src;
-  const char *trim_chars;
-  const char *expected;
-  const char *test_name;
-} mulParams;
-
-typedef struct {
-  const char *str;
-  const char *expected;
-  const char *test_name;
-} divParams;
+} TestParams;
 
 #define TEST_CASES(name, param_type, run_func, ...)                      \
   static param_type name[] = {__VA_ARGS__};                              \
@@ -42,16 +21,16 @@ typedef struct {
   END_TEST
 
 #define ADD_TEST_CASES(name, ...) \
-  TEST_CASES(name, addParams, run_add_test, __VA_ARGS__)
+  TEST_CASES(name, TestParams, run_add_test, __VA_ARGS__)
 
 #define SUB_TEST_CASES(name, ...) \
-  TEST_CASES(name, subParams, run_sub_test, __VA_ARGS__)
+  TEST_CASES(name, TestParams, run_sub_test, __VA_ARGS__)
 
 #define MUL_TEST_CASES(name, ...) \
-  TEST_CASES(name, mulParams, run_mul_test)
+  TEST_CASES(name, TestParams, run_mul_test, __VA_ARGS__)
 
 #define DIV_TEST_CASES(name, ...) \
-  TEST_CASES(name, divParams, run_div_test)
+  TEST_CASES(name, TestParams, run_div_test, __VA_ARGS__)
 
 void decimal_to_string(const s21_decimal a, char * buffer);
 int compare_decimal(const s21_decimal a, const s21_decimal b);
