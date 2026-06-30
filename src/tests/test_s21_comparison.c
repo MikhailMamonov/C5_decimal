@@ -239,7 +239,7 @@ COMPARE_EQUAL_TEST_CASES(equal_max_with_scale, {
 
 COMPARE_EQUAL_TEST_CASES(equal_large_scale, {
   .value1 = {{0x0001E240, 0x00000000, 0x00000000, 0x00060000}}, // 123456
-  .value2 = {{0x075BCD15, 0x00000000, 0x00000000, 0x00090000}}, // 123456000
+  .value2 = {{0x075BCA00, 0x00000000, 0x00000000, 0x00090000}}, // 123456000
   .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}},
   .expected_return_code = 1,
   .test_name = "0.123456 == 0.123456000 is TRUE"
@@ -263,8 +263,8 @@ COMPARE_EQUAL_TEST_CASES(equal_very_small_diff_scale, {
 
 // 8. Переполнение при выравнивании
 COMPARE_EQUAL_TEST_CASES(equal_no_overflow, {
-  .value1 = {{0x19999999, 0x00000000, 0x00000000, 0x00010000}}, // MAX/10
-  .value2 = {{0xFFFFFFFF, 0x00000000, 0x00000000, 0x00020000}}, // MAX/100
+  .value1 = {{0x0001E240, 0x00000000, 0x00000000, 0x00010000}}, // 12345.6
+  .value2 = {{0x0012D680, 0x00000000, 0x00000000, 0x00020000}}, 
   .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}},
   .expected_return_code = 1,
   .test_name = "MAX/10 == MAX/100 is TRUE"
@@ -466,7 +466,7 @@ COMPARE_NOT_EQUAL_TEST_CASES(not_equal_false_max_value, {
 
 COMPARE_NOT_EQUAL_TEST_CASES(not_equal_false_large_scale, {
   .value1 = {{0x0001E240, 0x00000000, 0x00000000, 0x00060000}}, // 123456
-  .value2 = {{0x075BCD15, 0x00000000, 0x00000000, 0x00090000}}, // 123456000
+  .value2 = {{0x075BCA00, 0x00000000, 0x00000000, 0x00090000}}, // 123456000
   .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, // 0
   .expected_return_code = 0,
   .test_name = "0.123456 != 0.123456000 is FALSE"
@@ -489,11 +489,11 @@ COMPARE_NOT_EQUAL_TEST_CASES(not_equal_false_very_small_diff_scale, {
 })
 
 COMPARE_NOT_EQUAL_TEST_CASES(not_equal_false_no_overflow, {
-  .value1 = {{0x19999999, 0x00000000, 0x00000000, 0x00010000}}, // MAX/10
-  .value2 = {{0xFFFFFFFF, 0x00000000, 0x00000000, 0x00020000}}, // MAX/100
+  .value1 = {{0x0001E240, 0x00000000, 0x00000000, 0x00010000}}, // 12345.6
+  .value2 = {{0x0012D680, 0x00000000, 0x00000000, 0x00020000}}, // 12345.6
   .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, // 0
   .expected_return_code = 0,
-  .test_name = "MAX/10 != MAX/100 is FALSE"
+  .test_name = "12345.6 != 12345.6 is FALSE"
 })
 
 // Тесты для s21_less
@@ -725,7 +725,7 @@ COMPARE_LESS_TEST_CASES(less_true_different_scale_2, {
 
 COMPARE_LESS_TEST_CASES(less_true_large_scale, {
   .value1 = {{0x0001E240, 0x00000000, 0x00000000, 0x00060000}}, // 0.123456
-  .value2 = {{0x075BCD15, 0x00000000, 0x00000000, 0x00080000}}, // 0.12345600
+  .value2 = {{0x00BC6100, 0x00000000, 0x00000000, 0x00080000}}, // 0.12345600
   .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, // 0
   .expected_return_code = 0,
   .test_name = "0.123456 < 0.12345600 is FALSE (equal)"
@@ -946,7 +946,7 @@ COMPARE_LESS_OR_EQUAL_TEST_CASES(less_or_equal_false_different_scale_2, {
   .value1 = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
   .value2 = {{0x0000000A, 0x00000000, 0x00000000, 0x00010000}}, // 1.0
   .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, // 0
-  .expected_return_code = 0,
+  .expected_return_code = 1,
   .test_name = "1 <= 1.0 is FALSE (equal, should be TRUE!)"
 })
 
@@ -1073,8 +1073,8 @@ COMPARE_GREATER_TEST_CASES(greater_true_very_small, {
 })
 
 COMPARE_GREATER_TEST_CASES(greater_true_no_overflow, {
-  .value1 = {{0x19999999, 0x00000000, 0x00000000, 0x00010000}}, // MAX/10
-  .value2 = {{0xFFFFFFFF, 0x00000000, 0x00000000, 0x00020000}}, // MAX/100
+  .value1 = {{0x99999999, 0x99999999, 0x99999999, 0x00000000}}, // MAX/10
+  .value2 = {{0x28F5C28F, 0x28F5C28F, 0x28F5C28F, 0x00000000}}, // MAX/100
   .expected_result = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
   .expected_return_code = 1,
   .test_name = "MAX/10 > MAX/100 is TRUE"
@@ -1226,7 +1226,7 @@ COMPARE_GREATER_TEST_CASES(greater_true_different_scale_2, {
 })
 
 COMPARE_GREATER_TEST_CASES(greater_true_large_scale, {
-  .value1 = {{0x075BCD15, 0x00000000, 0x00000000, 0x00080000}}, // 0.12345600
+  .value1 = {{0x00BC6100, 0x00000000, 0x00000000, 0x00080000}}, // 0.12345600
   .value2 = {{0x0001E240, 0x00000000, 0x00000000, 0x00060000}}, // 0.123456
   .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, // 0
   .expected_return_code = 0,
@@ -1412,9 +1412,9 @@ COMPARE_GREATER_OR_EQUAL_TEST_CASES(greater_or_equal_true_large_scale_equal, {
 })
 
 COMPARE_GREATER_OR_EQUAL_TEST_CASES(greater_or_equal_true_no_overflow, {
-  .value1 = {{0x19999999, 0x00000000, 0x00000000, 0x00010000}}, // MAX/10
+  .value1 = {{0xFFFFFFFF, 0x00000000, 0x00000000, 0x00010000}}, // MAX/10
   .value2 = {{0xFFFFFFFF, 0x00000000, 0x00000000, 0x00020000}}, // MAX/100
-  .expected_result = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
+  .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, // 0
   .expected_return_code = 1,
   .test_name = "MAX/10 >= MAX/100 is TRUE"
 })
@@ -1464,7 +1464,7 @@ COMPARE_GREATER_OR_EQUAL_TEST_CASES(greater_or_equal_false_different_scale_2, {
   .value1 = {{0x0000000A, 0x00000000, 0x00000000, 0x00010000}}, // 1.0
   .value2 = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}}, // 1
   .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, // 0
-  .expected_return_code = 0,
+  .expected_return_code = 1,
   .test_name = "1.0 >= 1 is FALSE (equal, should be TRUE!)"
 })
 

@@ -102,15 +102,6 @@ int div_by_10(s21_decimal *num) {
                 num->bits[curr_byte] = num->bits[curr_byte] | bit_mask;
             }
     }
-    /*if (remainder > 5) {
-        answer = add_one(answer);
-    } else if (remainder == 5) {
-        int even = 0;
-        int first_bit_mask = 1;
-        if (answer.bits[0] & first_bit_mask) {
-            answer = add_one(answer);
-        }
-    }*/
     return remainder;
 }
 
@@ -129,9 +120,9 @@ s21_decimal add_one(s21_decimal num) {
 int shift_left_1_bit(s21_decimal * value){
     unsigned int *b = (unsigned int *)value->bits;
     
-    int overflow_0_to_1 = (b[0]>>LAST_BIT)&SINGLE_BIT; 
-    int overflow_1_to_2 = (b[1]>>LAST_BIT)&SINGLE_BIT;
-    int overflow_all = (b[2]>> LAST_BIT)&SINGLE_BIT;
+    int overflow_0_to_1 = (b[0] >> 31) & 1u; 
+    int overflow_1_to_2 = (b[1] >> 31) & 1u;
+    int overflow_all    = (b[2] >> 31) & 1u;
     b[0] <<=SINGLE_BIT;
     b[1] <<=SINGLE_BIT;
     b[2] <<=SINGLE_BIT;
@@ -239,13 +230,14 @@ void align_scales(s21_decimal * value_1, s21_decimal * value_2){
                 s21_decimal one = {0};
                 one.bits[0] = 1;
                 s21_decimal temp_res ={0};
+
+                int current_sign = get_sign(source->bits[3]);
+                int current_scale = get_scale(source->bits[3]);
+                
                 set_sign(source, 0);
                 set_scale(source,0);
 
                 s21_add_mantissas(*source, one, &temp_res);
-
-                int current_sign = get_sign(source->bits[3]);
-                int current_scale = get_scale(source->bits[3]);
 
                 *source = temp_res;
 
@@ -253,6 +245,9 @@ void align_scales(s21_decimal * value_1, s21_decimal * value_2){
                 set_scale(source,current_scale);
             }
     }
+
+    set_scale(value_1, scale_1);
+    set_scale(value_2, scale_2);
 }
 
 int decimal_is_zero(s21_decimal value){
