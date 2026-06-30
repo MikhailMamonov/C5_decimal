@@ -119,23 +119,15 @@ s21_decimal add_one(s21_decimal num) {
 
 int shift_left_1_bit(s21_decimal * value){
     unsigned int *b = (unsigned int *)value->bits;
-    
-    int overflow_0_to_1 = (b[0] >> 31) & 1u; 
-    int overflow_1_to_2 = (b[1] >> 31) & 1u;
-    int overflow_all    = (b[2] >> 31) & 1u;
-    b[0] <<=SINGLE_BIT;
-    b[1] <<=SINGLE_BIT;
-    b[2] <<=SINGLE_BIT;
-
-    if(overflow_0_to_1){
-        b[1] |= 1u;
+    unsigned int last_overflow = 0;
+    unsigned int overflow = 0;
+    for (int i = 0; i < SIGNIFICANT_BYTES; i++) {
+        overflow = (b[i] >> LAST_BIT) & SINGLE_BIT;
+        b[i] <<= SINGLE_BIT;
+        b[i] |= last_overflow;
+        last_overflow = overflow;
     }
-
-    if(overflow_1_to_2){
-        b[2]|= 1u;
-    }
-
-    return overflow_all;
+    return overflow;
 }
 
 int shift_left(s21_decimal * value, int bits_count){
@@ -164,8 +156,8 @@ int mul_by_10(s21_decimal * value){
 }
 
 void align_scales(s21_decimal * value_1, s21_decimal * value_2){
-    int scale_1 = get_scale(value_1->bits[3]);
-    int scale_2 = get_scale(value_2->bits[3]);
+    int scale_1 = get_scale(value_1->bits[SIGN_BYTE_IDX]);
+    int scale_2 = get_scale(value_2->bits[SIGN_BYTE_IDX]);
 
     int isOverflow = 0;
     int existNonNull = 0;
@@ -189,8 +181,8 @@ void align_scales(s21_decimal * value_1, s21_decimal * value_2){
     if(isOverflow){
         *value_1 = backup_1;
         *value_2 = backup_2;
-        scale_1 = get_scale(value_1->bits[3]);
-        scale_2 = get_scale(value_2->bits[3]);
+        scale_1 = get_scale(value_1->bits[SIGN_BYTE_IDX]);
+        scale_2 = get_scale(value_2->bits[SIGN_BYTE_IDX]);
 
         int round_up = 0;
         s21_decimal *source = NULL;
@@ -231,8 +223,8 @@ void align_scales(s21_decimal * value_1, s21_decimal * value_2){
                 one.bits[0] = 1;
                 s21_decimal temp_res ={0};
 
-                int current_sign = get_sign(source->bits[3]);
-                int current_scale = get_scale(source->bits[3]);
+                int current_sign = get_sign(source->bits[SIGN_BYTE_IDX]);
+                int current_scale = get_scale(source->bits[SIGN_BYTE_IDX]);
                 
                 set_sign(source, 0);
                 set_scale(source,0);

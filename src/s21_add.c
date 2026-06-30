@@ -9,11 +9,11 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
 
     align_scales(&value_1, &value_2);
 
-    int sign_value_1 = get_sign(value_1.bits[3]);
-    int sign_value_2 = get_sign(value_2.bits[3]);
-    int final_scale = get_scale(value_1.bits[3]);
+    int sign_value_1 = get_sign(value_1.bits[SIGN_BYTE_IDX]);
+    int sign_value_2 = get_sign(value_2.bits[SIGN_BYTE_IDX]);
+    int final_scale = get_scale(value_1.bits[SIGN_BYTE_IDX]);
 
-    result->bits[0] = result->bits[1] = result->bits[2] = result->bits[3] = 0;
+    result->bits[0] = result->bits[1] = result->bits[2] = result->bits[SIGN_BYTE_IDX] = 0;
     s21_decimal *backup = result;
 
     int return_status = SUCCESS;
