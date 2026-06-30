@@ -38,6 +38,7 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 
 #include "s21_comparison.h"
+#include "s21_extra.h"
 #include "decimal_utils.h"
 
 

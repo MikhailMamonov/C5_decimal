@@ -8,6 +8,7 @@ Suite *sub_suite_create(void);
 Suite *mul_suite_create(void);
 Suite *div_suite_create(void);
 Suite *comparison_suite_create(void);
+Suite *extra_suite_create(void);
 
 
 void assemble_srunner(SRunner *sr) {
@@ -15,6 +16,7 @@ void assemble_srunner(SRunner *sr) {
   srunner_add_suite(sr, comparison_suite_create());
   srunner_add_suite(sr, mul_suite_create());
   srunner_add_suite(sr, div_suite_create());
+  srunner_add_suite(sr, extra_suite_create());
 }
 
 int main(void) {
