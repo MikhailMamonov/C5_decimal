@@ -92,16 +92,16 @@ int big_div_by_10(big_decimal *num) {
 }
 
 int big_add_one(big_decimal *value) {
-    unsigned int *b = (unsigned int *)value->bits;
+    unsigned int *bits = (unsigned int *)value->bits;
     int ret = 1;
 
     for (int i = 0; i < BIG_SIGNIFICANT_BYTES; i++) {
-        if (b[i] < MAX_MASK) {
-            b[i]++;
+        if (bits[i] < MAX_MASK) {
+            bits[i]++;
             ret = 0;
             break;
         } else {
-            b[i] = 0;
+            bits[i] = 0;
         }
     }
 
