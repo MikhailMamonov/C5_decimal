@@ -67,4 +67,13 @@ int compare_decimal(s21_decimal a, s21_decimal b);
 #define EXTRA_NEGATE_TEST_CASES(name, ...) \
   TEST_CASES(name, TestParams, run_negate_test, __VA_ARGS__)
 
+#define EXTRA_TRUNCATE_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_truncate_test, __VA_ARGS__)
+
+#define EXTRA_ROUND_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_round_test, __VA_ARGS__)
+
+#define EXTRA_FLOOR_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_floor_test, __VA_ARGS__)
+
 #endif
