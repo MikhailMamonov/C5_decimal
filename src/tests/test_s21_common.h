@@ -38,6 +38,20 @@ typedef struct {
   const char *test_name;
 } fromFloatParams;
 
+typedef struct {
+  const s21_decimal src;
+  const int expected_result;
+  int expected_return_code; 
+  const char *test_name;
+} toIntParams;
+
+typedef struct {
+  const s21_decimal src;
+  const float expected_result;
+  int expected_return_code; 
+  const char *test_name;
+} toFloatParams;
+
 #define TEST_CASES(name, param_type, run_func, ...)                      \
   static param_type name[] = {__VA_ARGS__};                              \
   START_TEST(test_##name) {                                              \
@@ -77,10 +91,17 @@ typedef struct {
 
 #define COMPARE_GREATER_OR_EQUAL_TEST_CASES(name, ...) \
   TEST_CASES(name, TestParams, run_compare_greater_or_equal_test, __VA_ARGS__)
+
 #define FROM_INT_TEST_CASES(name, ...) \
   TEST_CASES(name, fromIntParams, run_from_int_test, __VA_ARGS__)
 
 #define FROM_FLOAT_TEST_CASES(name, ...) \
   TEST_CASES(name, fromFloatParams, run_from_float_test, __VA_ARGS__)
+
+#define TO_INT_TEST_CASES(name, ...) \
+  TEST_CASES(name, toIntParams, run_to_int_test, __VA_ARGS__)
+
+#define TO_FLOAT_TEST_CASES(name, ...) \
+  TEST_CASES(name, toFloatParams, run_to_float_test, __VA_ARGS__)
 
 #endif

@@ -73,3 +73,62 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
     free(start);
     return SUCCESS;
 }
+
+int s21_from_decimal_to_int(s21_decimal src, int *dst) {
+    if (dst == NULL) {
+        return ERROR;
+    }
+    int scale = get_scale(src.bits[SIGN_BYTE_IDX]);
+    while (scale > 0) {
+        div_by_10(&src);
+        scale--;
+    }
+    int return_code = SUCCESS;
+    for (int i = 1; i < SIGNIFICANT_BYTES; i++) {
+        if (src.bits[i] != 0) {
+            return_code = ERROR;
+            break;
+        }
+    }
+    if (get_bit_val(src, SIGN_BIT) != 0 && get_sign(src.bits[SIGN_BYTE_IDX]) == SIGN_POSITIVE) {
+        return_code = ERROR;
+    }
+    unsigned int temp = (unsigned int)src.bits[0];
+    if (temp > MAX_INT) {
+        return_code = ERROR;
+    }
+    if (!return_code) {
+        *dst = (int)temp;
+    }
+    if (*dst < 0 && get_sign(src.bits[SIGN_BYTE_IDX]) == SIGN_POSITIVE) {
+        return_code = ERROR;
+    }
+    if (!return_code && get_sign(src.bits[SIGN_BYTE_IDX]) != SIGN_POSITIVE) {
+        if (*dst > MIN_INT) {
+            *dst *= -1;
+        }
+    }
+
+    return return_code;
+}
+
+int s21_from_decimal_to_float(s21_decimal src, float *dst) {
+    if (dst == NULL) {
+        return ERROR;
+    }
+    long double mantissa = (unsigned int)src.bits[0] + 
+                       ldexpl((unsigned int)src.bits[1], 32) + 
+                       ldexpl((unsigned int)src.bits[2], 64);
+    long double scale_normalizer = 1;
+    int scale = get_scale(src.bits[SIGN_BYTE_IDX]);
+    for (int i = 0; i < scale; i++) {
+        scale_normalizer *= 10.0;
+    }
+    mantissa /= scale_normalizer;
+    if (get_sign(src.bits[SIGN_BYTE_IDX]) == SIGN_NEGATIVE) {
+        mantissa *= -1;
+    }
+    *dst = (float)mantissa;
+
+    return SUCCESS;
+}
