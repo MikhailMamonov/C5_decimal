@@ -108,6 +108,7 @@ int div_by_10(s21_decimal *num) {
 int add_one(s21_decimal *value) {
     unsigned int *bits = (unsigned int *)value->bits;
     int ret = 1;
+    s21_decimal backup = *value;
 
     for (int i = 0; i < SIGNIFICANT_BYTES; i++) {
         if (bits[i] < MAX_MASK) {
@@ -117,6 +118,9 @@ int add_one(s21_decimal *value) {
         } else {
             bits[i] = 0;
         }
+    }
+    if (ret) {
+        *value = backup;
     }
 
     return ret;
