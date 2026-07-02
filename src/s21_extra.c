@@ -14,7 +14,7 @@ int s21_floor(s21_decimal value, s21_decimal *result){
     }
 
     *result = value;
-    if(sign>SIGN_POSITIVE || scale>0){
+    if(sign==SIGN_NEGATIVE || scale>0){
         if(!sign){
             s21_truncate(value, result);
         }
@@ -131,7 +131,7 @@ int s21_negate(s21_decimal value, s21_decimal *result){
     *result = value;
     if(decimal_is_zero(value)){
         // Ноль всегда положительный
-        set_sign(result, 0);
+        set_sign(result, SIGN_POSITIVE);
     }
     else{
         set_sign(result, !get_sign(value.bits[SIGN_BYTE_IDX]));    
