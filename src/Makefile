@@ -84,7 +84,7 @@ gcov_report: clean_gcov
 # Проверка стиля кода по стандарту Google
 style_check:
 	@echo "--- Проверка стиля clang-format (Google style) ---"
-	@clang-format -style=Google -n --Werror $(ALL_FORMAT_FILES)
+	@clang-format -style=Google -n -Werror $(ALL_FORMAT_FILES)
 	@echo "--- Проверка стиля пройдена успешно ---"
 
 # Автоматическое исправление стиля во всех файлах проекта

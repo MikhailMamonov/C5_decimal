@@ -9,4 +9,4 @@ int s21_is_greater_or_equal(s21_decimal value_1, s21_decimal value_2);
 int s21_is_equal(s21_decimal value_1, s21_decimal value_2);
 int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2);
 
-#endif // S21_COMPARISON_H
+#endif  // S21_COMPARISON_H

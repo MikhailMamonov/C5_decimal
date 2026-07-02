@@ -14,7 +14,7 @@
 #define SIGN_BIT 31
 #define MAX_MASK 0xFFFFFFFF
 #define MAX_UNSIGNED_LONG 0xFFFFFFFFULL
-#define SCALE_BIT 16 
+#define SCALE_BIT 16
 #define NEGATIVE_BYTE_VALUE 128
 #define SCALE_BYTE_IDX 2
 #define BITS_IN_BYTE 8
@@ -26,21 +26,18 @@
 #define LAST_BIT 31
 #define SINGLE_BIT 1
 
-typedef struct 
-{
-    int bits[4];
+typedef struct {
+  int bits[4];
 } s21_decimal;
-
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 
-#include "s21_comparison.h"
 #include "convertors.h"
-#include "s21_extra.h"
 #include "decimal_utils.h"
-
+#include "s21_comparison.h"
+#include "s21_extra.h"
 
 #endif

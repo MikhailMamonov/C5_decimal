@@ -14,7 +14,6 @@ Suite *to_int_suite_create(void);
 Suite *to_float_suite_create(void);
 Suite *extra_suite_create(void);
 
-
 void assemble_srunner(SRunner *sr) {
   srunner_add_suite(sr, sub_suite_create());
   srunner_add_suite(sr, comparison_suite_create());
@@ -39,4 +38,3 @@ int main(void) {
 
   return (failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
