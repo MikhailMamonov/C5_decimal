@@ -3,6 +3,10 @@
 int reverse_sign(int sign);
 
 int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+    if (!result)
+    {
+        return FAIL_TOO_LARGE;
+    }
 
     s21_decimal local_result = {0};
 

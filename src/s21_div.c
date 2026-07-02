@@ -5,6 +5,10 @@ void division_cycle(big_decimal dividend, big_decimal divider, big_decimal *rema
 int find_last_bit(big_decimal value_1);
 
 int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+    if (!result)
+    {
+        return FAIL_TOO_LARGE;
+    }
     big_decimal local_value_1 = assign(value_1);
     big_decimal local_value_2 = assign(value_2);
     big_decimal local_result = {0};

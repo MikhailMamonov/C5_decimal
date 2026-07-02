@@ -2,6 +2,10 @@
 #include "big_decimal.h"
 
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+    if (!result)
+    {
+        return FAIL_TOO_LARGE;
+    }
     big_decimal local_value_1 = assign(value_1);
     big_decimal local_value_2 = assign(value_2);
     big_decimal local_result = {0};
