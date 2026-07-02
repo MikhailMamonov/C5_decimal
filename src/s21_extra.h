@@ -1,6 +1,7 @@
 #ifndef S21_EXTRA_H
 #define S21_EXTRA_H
 
+#define ERROR 1
 // Другие функции (Other functions)
 int s21_floor(s21_decimal value, s21_decimal *result);
 int s21_round(s21_decimal value, s21_decimal *result);

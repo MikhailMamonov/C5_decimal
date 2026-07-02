@@ -1,15 +1,16 @@
 #include "s21_decimal.h"
+#include "stddef.h"
 
 int s21_floor(s21_decimal value, s21_decimal *result){
-    if (result == (void*)0) {
-        return 1; 
+    if (result == NULL) {
+        return ERROR; 
     }
 
     int sign = get_sign(value.bits[SIGN_BYTE_IDX]);
     int scale = get_scale(value.bits[SIGN_BYTE_IDX]);
     
     if(scale>28){
-        return 1;
+        return ERROR;
     }
 
     *result = value;
@@ -43,19 +44,20 @@ int s21_floor(s21_decimal value, s21_decimal *result){
         set_scale(result,0);
         }
     }
-    return 0;
+
+    return SUCCESS;
 }
 
   int s21_round(s21_decimal value, s21_decimal *result) {
-    if (result == (void*)0) {
-        return 1; 
+    if (result == NULL) {
+        return ERROR; 
     }
 
     int sign = get_sign(value.bits[SIGN_BYTE_IDX]);
     int scale = get_scale(value.bits[SIGN_BYTE_IDX]);
     
     if (scale < 0 || scale > 28) {
-        return 1;
+        return ERROR;
     }
     
     *result = value;
@@ -70,11 +72,10 @@ int s21_floor(s21_decimal value, s21_decimal *result){
     while (scale > 0) {
         int remainder = div_by_10(result);
         
-        // Если это САМЫЙ ПОСЛЕДНИЙ шаг деления (первая цифра после запятой)
         if (scale == 1) {
             first_digit = remainder;
         } 
-        // Если это любой другой шаг деления, и мы встретили НЕ ноль
+
         if (scale > 1 && remainder != 0) {
             existNonNull = 1;
         }
@@ -84,15 +85,12 @@ int s21_floor(s21_decimal value, s21_decimal *result){
 
     int round_up = 0;
 
-    // Банковское округление
     if (first_digit > 5) {
         round_up = 1;
     } else if (first_digit == 5) {
-        // Если после пятерки были еще цифры (как .5567) -> округляем всегда вверх
         if (existNonNull) {
             round_up = 1;
         } else {
-            // Если была чистая половина (как .5000) -> округляем к ближайшему четному
             if ((unsigned int)result->bits[0] & 1) {
                 round_up = 1;
             }
@@ -108,26 +106,25 @@ int s21_floor(s21_decimal value, s21_decimal *result){
             carry = sum >> 32;
         }
         if (carry != 0) {
-            return 1;  // Переполнение мантиссы
+            return ERROR;  // Переполнение мантиссы
         }
     }
 
-    // Возвращаем исходный знак
     set_sign(result, sign);
     set_scale(result, 0);
 
-    return 0;
+    return SUCCESS;
 }
 
 int s21_truncate(s21_decimal value, s21_decimal *result){
-     if (result == (void*)0) {
-        return 1; 
+     if (result == NULL) {
+        return ERROR; 
     }
 
     int current_scale = get_scale(value.bits[SIGN_BYTE_IDX]);
 
     if (current_scale > MAX_SCALE) {
-        return 1;  // ERROR_INVALID_SCALE
+        return ERROR;  // ERROR_INVALID_SCALE
     }
 
     *result = value;
@@ -138,13 +135,13 @@ int s21_truncate(s21_decimal value, s21_decimal *result){
     }
 
     set_scale(result, 0);
-    return 0;
+    return SUCCESS;
 }
 
 int s21_negate(s21_decimal value, s21_decimal *result){
     if (!result)
     {
-         return 1;
+         return ERROR;
     }
     
     *result = value;
@@ -156,5 +153,5 @@ int s21_negate(s21_decimal value, s21_decimal *result){
         set_sign(result, !get_sign(value.bits[SIGN_BYTE_IDX]));    
     }
 
-    return 0; 
+    return SUCCESS; 
 }

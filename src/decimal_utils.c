@@ -95,7 +95,6 @@ int div_by_10(s21_decimal *num) {
     return (int)remainder; 
 }
 
-
 s21_decimal add_one(s21_decimal num) {
     s21_decimal one;
     one.bits[0] = 1;
