@@ -15,7 +15,7 @@ int shift_left(s21_decimal * value, int bits_count);
 int shift_left_1_bit(s21_decimal * value);
 int mul_by_10(s21_decimal * value);
 int div_by_10(s21_decimal *num);
-int add_one(s21_decimal *num);
+int add_one(s21_decimal* num);
 int get_bit_val(s21_decimal value, int idx);
 int decimal_is_zero(s21_decimal value);
 int set_byte(int num, int byte_index, unsigned char new_byte);

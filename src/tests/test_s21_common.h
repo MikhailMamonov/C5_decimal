@@ -92,6 +92,18 @@ typedef struct {
 #define COMPARE_GREATER_OR_EQUAL_TEST_CASES(name, ...) \
   TEST_CASES(name, TestParams, run_compare_greater_or_equal_test, __VA_ARGS__)
 
+#define EXTRA_NEGATE_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_negate_test, __VA_ARGS__)
+
+#define EXTRA_TRUNCATE_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_truncate_test, __VA_ARGS__)
+
+#define EXTRA_ROUND_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_round_test, __VA_ARGS__)
+
+#define EXTRA_FLOOR_TEST_CASES(name, ...) \
+  TEST_CASES(name, TestParams, run_floor_test, __VA_ARGS__)
+
 #define FROM_INT_TEST_CASES(name, ...) \
   TEST_CASES(name, fromIntParams, run_from_int_test, __VA_ARGS__)
 
