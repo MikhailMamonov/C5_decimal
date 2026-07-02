@@ -24,7 +24,7 @@ int s21_from_int_to_decimal(int src, s21_decimal *dst) {
 }
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
-    if (dst == NULL || fabs(src) == INFINITY) {
+    if (dst == NULL || fabs(src) > MAX_DECIMAL) {
         return ERROR;
     }
     if (fabs(src) > 0 && fabs(src) < 1e-28) {
