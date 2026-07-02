@@ -79,6 +79,34 @@ FROM_FLOAT_TEST_CASES(from_float_too_small_limit, {
   .test_name = "Too small float underflow limit error"
 })
 
+FROM_FLOAT_TEST_CASES(from_float_overflow_positive, {
+  // Число 1e32 намного больше, чем MAX_DECIMAL (7.92e28), но меньше INFINITY (3.4e38).
+  // Функция должна поймать это на старте и вернуть ошибку конвертации.
+  .src = 1.0e32f,
+  .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, 
+  .expected_return_code = 1, // ERROR (CONVERSION_ERROR)
+  .test_name = "Float overflow positive error: 1e32"
+})
+
+FROM_FLOAT_TEST_CASES(from_float_overflow_negative, {
+  // Зеркальный тест для огромного отрицательного числа.
+  // Должен возвращать код ошибки 1.
+  .src = -1.0e32f,
+  .expected_result = {{0x00000000, 0x00000000, 0x00000000, 0x00000000}}, 
+  .expected_return_code = 1, // ERROR (CONVERSION_ERROR)
+  .test_name = "Float overflow negative error: -1e32"
+})
+
+FROM_FLOAT_TEST_CASES(from_float_exactly_max_decimal, {
+  // Число ровно на грани лимита MAX_DECIMAL. 
+  // float удерживает 7 значащих цифр, превращая его в 7.922816e+28.
+  // Истинное шестнадцатеричное значение, которое восстанавливает ваш код:
+  .src = 7.9228162514264337593543950335e+28f,
+  .expected_result = {{0x20000000, 0xB392B21A, 0xFFFFFF77, 0x00000000}}, // scale 0
+  .expected_return_code = 0,
+  .test_name = "Float exactly equal to MAX_DECIMAL"
+})
+
 Suite *from_float_suite_create(void) {
   Suite *s = suite_create("From float");
   TCase *tc = tcase_create("core");
@@ -89,6 +117,10 @@ Suite *from_float_suite_create(void) {
     tcase_add_test(tc, test_from_float_small_fraction);
     tcase_add_test(tc, test_from_float_large_number);
     tcase_add_test(tc, test_from_float_too_small_limit);
+    tcase_add_test(tc, test_from_float_overflow_positive);
+    tcase_add_test(tc, test_from_float_overflow_negative);
+    tcase_add_test(tc, test_from_float_exactly_max_decimal);
+
 
   suite_add_tcase(s, tc);
   return s;
