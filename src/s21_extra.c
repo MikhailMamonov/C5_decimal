@@ -9,12 +9,12 @@ int s21_floor(s21_decimal value, s21_decimal *result){
     int sign = get_sign(value.bits[SIGN_BYTE_IDX]);
     int scale = get_scale(value.bits[SIGN_BYTE_IDX]);
     
-    if(scale>28){
+    if(scale>MAX_SCALE){
         return ERROR;
     }
 
     *result = value;
-    if(sign>0 || scale>0){
+    if(sign>SIGN_POSITIVE || scale>0){
         if(!sign){
             s21_truncate(value, result);
         }
@@ -32,18 +32,14 @@ int s21_floor(s21_decimal value, s21_decimal *result){
                 scale--;
             }
             
-            if(has_fraction){
-                s21_decimal one = {{0x00000001, 0x00000000, 0x00000000, 0x00000000}};
-                s21_decimal temp = *result;
-                
-                s21_add_mantissas(*result, one, &temp);
-                
-                *result = temp;
+            if(has_fraction && add_one(result)>0){
+                //Переполнение
+                return ERROR;
+            }
         }
         set_sign(result, sign);
         set_scale(result,0);
         }
-    }
 
     return SUCCESS;
 }
@@ -56,7 +52,7 @@ int s21_floor(s21_decimal value, s21_decimal *result){
     int sign = get_sign(value.bits[SIGN_BYTE_IDX]);
     int scale = get_scale(value.bits[SIGN_BYTE_IDX]);
     
-    if (scale < 0 || scale > 28) {
+    if (scale < 0 || scale > MAX_SCALE) {
         return ERROR;
     }
     
@@ -66,16 +62,12 @@ int s21_floor(s21_decimal value, s21_decimal *result){
     set_sign(result, 0);
     set_scale(result, 0);
 
-    int first_digit = 0;  
     int existNonNull = 0;
+    int remainder = 0;
 
     while (scale > 0) {
-        int remainder = div_by_10(result);
+        remainder = div_by_10(result);
         
-        if (scale == 1) {
-            first_digit = remainder;
-        } 
-
         if (scale > 1 && remainder != 0) {
             existNonNull = 1;
         }
@@ -85,9 +77,9 @@ int s21_floor(s21_decimal value, s21_decimal *result){
 
     int round_up = 0;
 
-    if (first_digit > 5) {
+    if (remainder > 5) {
         round_up = 1;
-    } else if (first_digit == 5) {
+    } else if (remainder == 5) {
         if (existNonNull) {
             round_up = 1;
         } else {
@@ -97,17 +89,9 @@ int s21_floor(s21_decimal value, s21_decimal *result){
         }
     }
 
-    // Прибавление единицы без вызова сторонних функций сложения
-    if (round_up) {
-        unsigned long long carry = 1;
-        for (int i = 0; i < 3; i++) {
-            unsigned long long sum = (unsigned long long)(unsigned int)result->bits[i] + carry;
-            result->bits[i] = (int)(sum & 0xFFFFFFFF);
-            carry = sum >> 32;
-        }
-        if (carry != 0) {
-            return ERROR;  // Переполнение мантиссы
-        }
+    if (round_up && add_one(result)>0) {
+        //Переполнение
+        return ERROR;
     }
 
     set_sign(result, sign);
@@ -147,7 +131,7 @@ int s21_negate(s21_decimal value, s21_decimal *result){
     *result = value;
     if(decimal_is_zero(value)){
         // Ноль всегда положительный
-        result->bits[3] = 0;
+        set_sign(result, 0);
     }
     else{
         set_sign(result, !get_sign(value.bits[SIGN_BYTE_IDX]));    

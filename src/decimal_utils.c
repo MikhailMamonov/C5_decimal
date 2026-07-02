@@ -105,7 +105,7 @@ int div_by_10(s21_decimal *num) {
     return remainder;
 }
 
-s21_decimal add_one(s21_decimal num) {
+int add_one(s21_decimal* num) {
     s21_decimal one;
     one.bits[0] = 1;
     for (int i = 1 ; i <= SIGNIFICANT_BYTES; i++) {
@@ -113,8 +113,7 @@ s21_decimal add_one(s21_decimal num) {
     }
     set_scale(&one, 0);
     set_sign(&one, SIGN_POSITIVE);
-    s21_add(num, one, &num);
-    return num;
+    return s21_add(*num, one, num);
 }
 
 int shift_left_1_bit(s21_decimal * value){
