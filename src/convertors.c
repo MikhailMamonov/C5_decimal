@@ -39,6 +39,9 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
     }
     int exp_presicion = MAX_FLOAT_PRECISION - 1;
     char *str = malloc(sizeof(char) * (MAX_SCALE));
+    if (str == NULL) {
+        return ERROR;
+    }
     char *start = str;
     sprintf(str, "%.6e", src);
     int exponent = 0, is_exponent = 0, exp_sign = 1;
