@@ -1,0 +1,40 @@
+#include <check.h>
+#include <stdlib.h>
+
+#include "../s21_decimal.h"
+// standart library functions
+Suite *add_suite_create(void);
+Suite *sub_suite_create(void);
+Suite *mul_suite_create(void);
+Suite *div_suite_create(void);
+Suite *comparison_suite_create(void);
+Suite *from_int_suite_create(void);
+Suite *from_float_suite_create(void);
+Suite *to_int_suite_create(void);
+Suite *to_float_suite_create(void);
+Suite *extra_suite_create(void);
+
+void assemble_srunner(SRunner *sr) {
+  srunner_add_suite(sr, sub_suite_create());
+  srunner_add_suite(sr, comparison_suite_create());
+  srunner_add_suite(sr, mul_suite_create());
+  srunner_add_suite(sr, div_suite_create());
+  srunner_add_suite(sr, from_int_suite_create());
+  srunner_add_suite(sr, from_float_suite_create());
+  srunner_add_suite(sr, to_int_suite_create());
+  srunner_add_suite(sr, to_float_suite_create());
+  srunner_add_suite(sr, extra_suite_create());
+}
+
+int main(void) {
+  int failed = 0;
+  SRunner *sr = srunner_create(add_suite_create());
+  assemble_srunner(sr);
+  srunner_set_fork_status(sr, CK_NOFORK);
+
+  srunner_run_all(sr, CK_NORMAL);
+  failed = srunner_ntests_failed(sr);
+  srunner_free(sr);
+
+  return (failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+}

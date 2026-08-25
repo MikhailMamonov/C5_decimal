@@ -1,191 +1,100 @@
-# s21_decimal 
+# s21_decimal
 
-Implementation of your own s21_decimal.h library.
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/MikhailMamonov/C5_decimal)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/MikhailMamonov/C5_decimal)
+[![Language](https://img.shields.io/badge/language-C-blue)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![Standard](https://img.shields.io/badge/standard-C11-blue)](https://en.wikipedia.org/wiki/C11_(C_standard_revision))
 
-💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
+Данный проект реализует пользовательскую библиотеку `s21_decimal` на языке программирования C. Она предоставляет тип данных с фиксированной точкой для точных финансовых расчётов, устраняя ошибки округления, присущие стандарту IEEE 754 с плавающей запятой.
 
-## Contents
+Библиотека эмулирует поведение типа `decimal` из C#, поддерживая арифметические, сравнительные, конвертирующие и округляющие операции.
 
-1. [Chapter I](#chapter-i) \
-   1.1. [Introduction](#introduction)
-2. [Chapter II](#chapter-ii) \
-   2.1. [Information](#information)
-3. [Chapter III](#chapter-iii) \
-   3.1. [Part 1](#part-1-implementation-of-the-decimalh-library-functions)
+---
 
-## Instructions 
+## 🚀 Основные возможности
 
-How to learn at “School 21”:
+- **Арифметические операции**: сложение, вычитание, умножение и деление с банковским округлением.
+- **Операторы сравнения**: `<`, `<=`, `>`, `>=`, `==` и `!=`.
+- **Функции преобразования**: `int` ↔ `decimal` и `float` ↔ `decimal`.
+- **Вспомогательные функции**: `floor`, `round`, `truncate` и `negate`.
+- **Высокое покрытие тестами**: модульные тесты покрывают более 80% кода каждой функции.
 
-- Here, you’ll find a unique learning experience with a lot of freedom. You’re given a task and left to find your own way to solve it, using whatever resources work best for you — whether that’s the Internet or AI tools like GigaChat. Just be mindful of information quality: verify, think critically, analyze, and compare.
-- Peer-to-peer (P2P) learning is the exchange of knowledge and experience with peers, where everyone acts as both mentor and student. This approach allows you to gain a deeper understanding of the material by learning from one another.
-- Feel free to ask for help: around you are peers who are also navigating this path for the first time. Share your own experience and ideas with others.  Join Rocket.Chat to stay updated with the latest community announcements. 
-- Your learning is meaningless if you just copy someone else’s solutions. When receiving help from others, always make sure you fully understand the “why”, “how”, and “purpose” behind the solution. Don’t be afraid to make mistakes. 
-- Does the task seem impossible? Take a break, get some fresh air and clear your mind — this has helped many people. Maybe after that, the solution will come to you naturally.
-- The learning process is just as important as the result. It’s not just about completing the task — it’s about understanding HOW to solve it. 
+## 🛠️ Технический стек
 
-## Chapter I
+- **Язык**: C (стандарт C11)
+- **Компилятор**: `gcc`
+- **Фреймворк для тестирования**: [Check](https://libcheck.github.io/check/)
+- **Покрытие кода**: `gcov` и `lcov`
+- **Сборка**: `Makefile`
+- **Стиль кодирования**: [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
 
-![s21_decimal](misc/images/s21_decimal.png)
+---
 
-Planet Earth, 1990s. 
+## 🧱 Двоичное представление
 
-The world economy is growing exponentially, the stock market is growing year by year, more and more companies are going public and their shares are listed. The number of users, the number of transactions, the price, the commission, the interest, the calculation of technical financial indicators... It's hard to overestimate the accuracy of all this data, and there are serious problems with the current outdated data types used in the financial sector.
-
-Millions of dollars are lost every year due to a miscalculation in the IEEE 754 (float) standard that simply disappears from the system. 
-
-In addition to the FIX (Financial Information eXchange) protocol, which is being developed to handle data between the broker and the exchange, another tool is needed to transfer and store data.
-
-At the follow-up meeting:
-
-*"So, gentlemen, please note that our group of specialists, who have already proven themselves in many successful projects, have been commissioned by the government to develop a completely new type of data, code-named Decimal. Its purpose is to make it possible to significantly reduce, and in some cases eliminate, errors in the world's financial transactions for several decades. It is required to describe all the necessary logical and arithmetic operations that would allow the necessary calculations to be performed quickly and conveniently."*
-
-*"Wow, that's quite an order we got, and from such a customer! We have to keep this client — it promises us big contracts in the future if we do well!"*
-
-*"Yes, you're right, that's why we need to think about what features to implement... Any suggestions?"*
-
-*"Sum and difference..."*
-
-*"Multiplication and division..."*
-
-*"Agreed, but we need more!"*
-
-*"Take the remainder, comparison and conversion operations!"*
-
-*"Mathematical rounding in all directions!"*
-
-*"Yes, I think that's enough, let's get to work! We only have a few days left, don't let us down!"*
-
-## Introduction
-
-In this project you will implement the library s21_decimal.h in the programming language C. The purpose of this library is to add the ability to work with the "decimal" type, which is not in the language standard. However, this type is very important. For example, for financial calculations, where calculation errors characteristic of floating-point types are unacceptable. As part of the project, you will work with the tasks of processing financial information, dive into the issues of internal representation of different types of data, and solidify your knowledge of structured programming.
-
-## Chapter II
-
-## Information
-
-The Decimal value type represents decimal numbers from positive 79,228,162,514,264,337,593,543,950,335 to negative 79,228,162,514,264,337,593,543,950,335. The default value of a Decimal is 0. The Decimal value type is suitable for financial calculations that require a large number of significant integral and fractional digits and that do not have rounding errors. The Decimal type does not eliminate the need for rounding. Rather, it minimizes rounding errors.
-
-When the result of the division and multiplication is passed to the Round method, the result suffers no loss of precision.
-
-A Decimal number is a floating point value that consists of a sign, a numerical value where each digit in the value ranges from 0 to 9, and a scaling factor that indicates the position of a floating decimal point that separates the integral and fractional parts of the numerical value.
-
-The binary representation of a Decimal value consists of a 1-bit sign, a 96-bit integer, and a scaling factor that is used to divide the 96-bit integer and specify what portion of it is a Decimal fraction. The scaling factor is implicitly the number 10 raised to an exponent between 0 and 28. Therefore, the binary representation of a Decimal value has the form ((-2^96 to 2^96) / 10^(0 to 28)), where -(2^96-1) is equal to MinValue and 2^96-1 is equal to MaxValue.
-
-The scaling factor can also preserve any trailing zeros in a Decimal number. Trailing zeros do not affect the value of a Decimal number in arithmetic or comparison operations. 
-
-### Binary representation
-
-The binary representation of a Decimal number consists of a 1-bit sign, a 96-bit integer number, and a scaling factor that is used to divide the integer number and specify what portion of it is a decimal fraction. The scaling factor is implicitly the number 10 raised to an exponent between 0 and 28.
-
-The Decimal number can be implemented as a four-element array of 32-bit signed integers (`int bits[4];`).
-
-`bits[0]`, `bits[1]`, and `bits[2]` contain the low, middle, and high 32 bits of the 96-bit integer, respectively.
-
-`bits[3]` contains the scaling factor and sign and consists of the following parts:
-- Bits 0 through 15, the lower word, are unused and must be zero.
-- Bits 16 to 23 must contain an exponent between 0 and 28, indicating the power of 10 to divide the integer.
-- Bits 24 through 30 are unused and must be zero.
-- Bit 31 contains the sign; 0 is positive and 1 is negative.
-
-Note that the bit representation distinguishes between negative and positive zeros. These values can be treated as equal in all operations.
-
-### Example:
+Тип `s21_decimal` реализован как 128-битная структура, определённая в файле `s21_decimal.h`:
 
 ```c
-typedef struct 
-{
+typedef struct {
     int bits[4];
 } s21_decimal;
 ```
+bits[0], bits[1], bits[2]: содержат младшие, средние и старшие 32 бита 96-битного целого числа.
 
-### Arithmetic Operators
+bits[3]: содержит коэффициент масштабирования (показатель степени от 0 до 28) в битах 16–23 и знак (бит 31).
 
-| Operator name | Operators  | Function                                                                           | 
-| ------ | ------ |------------------------------------------------------------------------------------|
-| Addition | + | int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)         |
-| Subtraction | - | int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) |
-| Multiplication | * | int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) | 
-| Division | / | int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) |
+Подробности описаны в документации проекта.
 
-The functions return the error code:
-- 0 — OK;
-- 1 — the number is too large or equal to infinity;
-- 2 — the number is too small or equal to negative infinity;
-- 3 — division by 0.
+--- 
 
-*Note on the numbers that do not fit into the mantissa:*
-- *When getting numbers that do not fit into the mantissa during arithmetic operations, use bank rounding (for example, 79,228,162,514,264,337,593,543,950,335 — 0.6 = 79,228,162,514,264,337,593,543,950,334)*
+## 📦 Установка и сборка
+Сборка библиотеки
+```bash
+make s21_decimal.a
+```
 
-### Comparison Operators
+Запуск всех модульных тестов
 
-| Operator name | Operators  | Function | 
-| ------ | ------ | ------ |
-| Less than | < | int s21_is_less(s21_decimal, s21_decimal) |
-| Less than or equal to | <= | int s21_is_less_or_equal(s21_decimal, s21_decimal) | 
-| Greater than | > |  int s21_is_greater(s21_decimal, s21_decimal) |
-| Greater than or equal to | >= | int s21_is_greater_or_equal(s21_decimal, s21_decimal) | 
-| Equal to | == |  int s21_is_equal(s21_decimal, s21_decimal) |
-| Not equal to | != |  int s21_is_not_equal(s21_decimal, s21_decimal) |
+```bash
+make test
+```
 
-Return value:
-- 0 — FALSE;
-- 1 — TRUE.
+Генерация отчёта о покрытии кода
 
-### Convertors and parsers
+```bash
+make gcov_report
+```
 
-| Convertor/parser | Function | 
-| ------ | ------ |
-| From int  | int s21_from_int_to_decimal(int src, s21_decimal *dst) |
-| From float  | int s21_from_float_to_decimal(float src, s21_decimal *dst) |
-| To int  | int s21_from_decimal_to_int(s21_decimal src, int *dst) |
-| To float  | int s21_from_decimal_to_float(s21_decimal src, float *dst) |
+Очистка артефактов сборки
 
-Return value — code error:
-- 0 — OK;
-- 1 — convertation error.
+```bash
+make clean
+```
 
-*Note on the conversion of a float type number:*
-- *If the numbers are too small (0 < |x| < 1e-28), return an error and value equal to 0*.
-- *If the numbers are too large (|x| > 79,228,162,514,264,337,593,543,950,335) or are equal to infinity, return an error*.
-- *When processing a number with the float type, convert all the significant decimal digits contained in it. If there are more than 7 such digits, the number is rounded using bank rounding to the number that does not have more than 7 significant decimal digits.*
+## 🧪 Пример использования
 
-*Note on the conversion from decimal type to int:*
-- *If there is a fractional part in a decimal number, it should be discarded (for example, 0.9 is converted to 0)*.
+```c
+#include "s21_decimal.h"
+#include <stdio.h>
 
+int main() {
+    s21_decimal a = {{0}};
+    s21_decimal b = {{0}};
+    s21_decimal result = {{0}};
 
-### Other functions
+    s21_from_int_to_decimal(10, &a);
+    s21_from_int_to_decimal(3, &b);
 
-| Description | Function                                                         | 
-| ------ |------------------------------------------------------------------|
-| Rounds a specified Decimal number to the closest integer toward negative infinity. | int s21_floor(s21_decimal value, s21_decimal *result)            |	
-| Rounds a decimal value to the nearest integer. | int s21_round(s21_decimal value, s21_decimal *result)    |
-| Returns the integral digits of the specified Decimal; any fractional digits are discarded, including trailing zeroes. | int s21_truncate(s21_decimal value, s21_decimal *result) |
-| Returns the result of multiplying the specified Decimal value by negative one. | int s21_negate(s21_decimal value, s21_decimal *result)   |
+    s21_div(a, b, &result); // 10 / 3
 
-Return value — code error:
-- 0 — OK;
-- 1 — calculation error.
+    float res_float;
+    s21_from_decimal_to_float(result, &res_float);
+    printf("Результат: %f\n", res_float); // Вывод: 3.333333...
 
-## Chapter III
+    return 0;
+}
+```
 
-## Part 1. Implementation of the decimal.h library functions
+## 🤝 Вклад в проект
 
-The functions of the decimal.h library described [above](#information) must be implemented:
-- Before starting, clone the project from GitLab into a repository with the same name.
-- The library must be developed in C language of C11 standard using gcc compiler.
-- The library code must be located in the _src_ folder on the _develop_ branch.
-- Do not use outdated and legacy language constructions and library functions. Pay attention to the legacy and obsolete marks in the official documentation on the language and the libraries used. Use the POSIX.1-2017 standard.
-- When writing code it is necessary to follow the Google style for C++ ([link](https://google.github.io/styleguide/cppguide.html)).
-- Make it as a static library named *s21_decimal.a* (with the s21_decimal.h header file).
-- The library must be developed according to the principles of structured programming.
-- Use prefix s21_ before each function.
-- Prepare full coverage of library functions code with unit-tests using the Check library.
-- Unit tests must cover at least 80% of each function (checked using gcov).
-- Provide a Makefile for building the library and tests (with targets all, clean, test, s21_decimal.a, gcov_report).
-- The gcov_report target should generate a gcov report in the form of an html page. Unit tests must be run with gcov flags to do this.
-- When implementing decimal, stick to [the binary representation](#binary-representation) with the integer `bits` array as specified in the [example above](#example). Observe the position of the digits of a number in the `bits` array;
-- It is forbidden to use the __int128 type.
-- Trailing zeros can be as preserved as deleted (except for the `s21_truncate` function).
-- The defined type must support numbers from -79,228,162,514,264,337,593,543,950,335 to +79,228,162,514,264,337,593,543,950,335.
-- Your directory should not contain any files other than those specified in the assignments.
+Этот проект является учебной реализацией в рамках программы Школы 21. Тем не менее, предложения и улучшения приветствуются! Вы можете форкнуть репозиторий и отправить pull request.
